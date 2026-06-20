@@ -19,18 +19,18 @@ import { Route as AppSubscriptionsRouteImport } from './routes/app.subscriptions
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppReceptionistsRouteImport } from './routes/app.receptionists'
-import { Route as AppPrescriptionsRouteImport } from './routes/app.prescriptions'
 import { Route as AppPaymentsRouteImport } from './routes/app.payments'
 import { Route as AppPatientsRouteImport } from './routes/app.patients'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppMedicalHistoryRouteImport } from './routes/app.medical-history'
 import { Route as AppFilesRouteImport } from './routes/app.files'
 import { Route as AppDoctorsRouteImport } from './routes/app.doctors'
-import { Route as AppClinicsRouteImport } from './routes/app.clinics'
-import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditLogsRouteImport } from './routes/app.audit-logs'
-import { Route as AppAppointmentsRouteImport } from './routes/app.appointments'
+import { Route as AppPrescriptionsIndexRouteImport } from './routes/app.prescriptions.index'
 import { Route as AppPatientsIndexRouteImport } from './routes/app.patients.index'
+import { Route as AppClinicsIndexRouteImport } from './routes/app.clinics.index'
+import { Route as AppBillingIndexRouteImport } from './routes/app.billing.index'
+import { Route as AppAppointmentsIndexRouteImport } from './routes/app.appointments.index'
 import { Route as AppPrescriptionsNewRouteImport } from './routes/app.prescriptions.new'
 import { Route as AppPatientsNewRouteImport } from './routes/app.patients.new'
 import { Route as AppPatientsIdRouteImport } from './routes/app.patients.$id'
@@ -88,11 +88,6 @@ const AppReceptionistsRoute = AppReceptionistsRouteImport.update({
   path: '/receptionists',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPrescriptionsRoute = AppPrescriptionsRouteImport.update({
-  id: '/prescriptions',
-  path: '/prescriptions',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppPaymentsRoute = AppPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -123,24 +118,14 @@ const AppDoctorsRoute = AppDoctorsRouteImport.update({
   path: '/doctors',
   getParentRoute: () => AppRoute,
 } as any)
-const AppClinicsRoute = AppClinicsRouteImport.update({
-  id: '/clinics',
-  path: '/clinics',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppBillingRoute = AppBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAuditLogsRoute = AppAuditLogsRouteImport.update({
   id: '/audit-logs',
   path: '/audit-logs',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAppointmentsRoute = AppAppointmentsRouteImport.update({
-  id: '/appointments',
-  path: '/appointments',
+const AppPrescriptionsIndexRoute = AppPrescriptionsIndexRouteImport.update({
+  id: '/prescriptions/',
+  path: '/prescriptions/',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPatientsIndexRoute = AppPatientsIndexRouteImport.update({
@@ -148,10 +133,25 @@ const AppPatientsIndexRoute = AppPatientsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppPatientsRoute,
 } as any)
+const AppClinicsIndexRoute = AppClinicsIndexRouteImport.update({
+  id: '/clinics/',
+  path: '/clinics/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBillingIndexRoute = AppBillingIndexRouteImport.update({
+  id: '/billing/',
+  path: '/billing/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAppointmentsIndexRoute = AppAppointmentsIndexRouteImport.update({
+  id: '/appointments/',
+  path: '/appointments/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPrescriptionsNewRoute = AppPrescriptionsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AppPrescriptionsRoute,
+  id: '/prescriptions/new',
+  path: '/prescriptions/new',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppPatientsNewRoute = AppPatientsNewRouteImport.update({
   id: '/new',
@@ -164,36 +164,32 @@ const AppPatientsIdRoute = AppPatientsIdRouteImport.update({
   getParentRoute: () => AppPatientsRoute,
 } as any)
 const AppClinicsNewRoute = AppClinicsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AppClinicsRoute,
+  id: '/clinics/new',
+  path: '/clinics/new',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppBillingNewRoute = AppBillingNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AppBillingRoute,
+  id: '/billing/new',
+  path: '/billing/new',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAppointmentsNewRoute = AppAppointmentsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AppAppointmentsRoute,
+  id: '/appointments/new',
+  path: '/appointments/new',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/app/appointments': typeof AppAppointmentsRouteWithChildren
   '/app/audit-logs': typeof AppAuditLogsRoute
-  '/app/billing': typeof AppBillingRouteWithChildren
-  '/app/clinics': typeof AppClinicsRouteWithChildren
   '/app/doctors': typeof AppDoctorsRoute
   '/app/files': typeof AppFilesRoute
   '/app/medical-history': typeof AppMedicalHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/patients': typeof AppPatientsRouteWithChildren
   '/app/payments': typeof AppPaymentsRoute
-  '/app/prescriptions': typeof AppPrescriptionsRouteWithChildren
   '/app/receptionists': typeof AppReceptionistsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
@@ -207,21 +203,21 @@ export interface FileRoutesByFullPath {
   '/app/patients/$id': typeof AppPatientsIdRoute
   '/app/patients/new': typeof AppPatientsNewRoute
   '/app/prescriptions/new': typeof AppPrescriptionsNewRoute
+  '/app/appointments/': typeof AppAppointmentsIndexRoute
+  '/app/billing/': typeof AppBillingIndexRoute
+  '/app/clinics/': typeof AppClinicsIndexRoute
   '/app/patients/': typeof AppPatientsIndexRoute
+  '/app/prescriptions/': typeof AppPrescriptionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/app/appointments': typeof AppAppointmentsRouteWithChildren
   '/app/audit-logs': typeof AppAuditLogsRoute
-  '/app/billing': typeof AppBillingRouteWithChildren
-  '/app/clinics': typeof AppClinicsRouteWithChildren
   '/app/doctors': typeof AppDoctorsRoute
   '/app/files': typeof AppFilesRoute
   '/app/medical-history': typeof AppMedicalHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/payments': typeof AppPaymentsRoute
-  '/app/prescriptions': typeof AppPrescriptionsRouteWithChildren
   '/app/receptionists': typeof AppReceptionistsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
@@ -235,24 +231,24 @@ export interface FileRoutesByTo {
   '/app/patients/$id': typeof AppPatientsIdRoute
   '/app/patients/new': typeof AppPatientsNewRoute
   '/app/prescriptions/new': typeof AppPrescriptionsNewRoute
+  '/app/appointments': typeof AppAppointmentsIndexRoute
+  '/app/billing': typeof AppBillingIndexRoute
+  '/app/clinics': typeof AppClinicsIndexRoute
   '/app/patients': typeof AppPatientsIndexRoute
+  '/app/prescriptions': typeof AppPrescriptionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/app/appointments': typeof AppAppointmentsRouteWithChildren
   '/app/audit-logs': typeof AppAuditLogsRoute
-  '/app/billing': typeof AppBillingRouteWithChildren
-  '/app/clinics': typeof AppClinicsRouteWithChildren
   '/app/doctors': typeof AppDoctorsRoute
   '/app/files': typeof AppFilesRoute
   '/app/medical-history': typeof AppMedicalHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/patients': typeof AppPatientsRouteWithChildren
   '/app/payments': typeof AppPaymentsRoute
-  '/app/prescriptions': typeof AppPrescriptionsRouteWithChildren
   '/app/receptionists': typeof AppReceptionistsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
@@ -266,7 +262,11 @@ export interface FileRoutesById {
   '/app/patients/$id': typeof AppPatientsIdRoute
   '/app/patients/new': typeof AppPatientsNewRoute
   '/app/prescriptions/new': typeof AppPrescriptionsNewRoute
+  '/app/appointments/': typeof AppAppointmentsIndexRoute
+  '/app/billing/': typeof AppBillingIndexRoute
+  '/app/clinics/': typeof AppClinicsIndexRoute
   '/app/patients/': typeof AppPatientsIndexRoute
+  '/app/prescriptions/': typeof AppPrescriptionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -274,17 +274,13 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
-    | '/app/appointments'
     | '/app/audit-logs'
-    | '/app/billing'
-    | '/app/clinics'
     | '/app/doctors'
     | '/app/files'
     | '/app/medical-history'
     | '/app/notifications'
     | '/app/patients'
     | '/app/payments'
-    | '/app/prescriptions'
     | '/app/receptionists'
     | '/app/reports'
     | '/app/settings'
@@ -298,21 +294,21 @@ export interface FileRouteTypes {
     | '/app/patients/$id'
     | '/app/patients/new'
     | '/app/prescriptions/new'
+    | '/app/appointments/'
+    | '/app/billing/'
+    | '/app/clinics/'
     | '/app/patients/'
+    | '/app/prescriptions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/app/appointments'
     | '/app/audit-logs'
-    | '/app/billing'
-    | '/app/clinics'
     | '/app/doctors'
     | '/app/files'
     | '/app/medical-history'
     | '/app/notifications'
     | '/app/payments'
-    | '/app/prescriptions'
     | '/app/receptionists'
     | '/app/reports'
     | '/app/settings'
@@ -326,23 +322,23 @@ export interface FileRouteTypes {
     | '/app/patients/$id'
     | '/app/patients/new'
     | '/app/prescriptions/new'
+    | '/app/appointments'
+    | '/app/billing'
+    | '/app/clinics'
     | '/app/patients'
+    | '/app/prescriptions'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/login'
-    | '/app/appointments'
     | '/app/audit-logs'
-    | '/app/billing'
-    | '/app/clinics'
     | '/app/doctors'
     | '/app/files'
     | '/app/medical-history'
     | '/app/notifications'
     | '/app/patients'
     | '/app/payments'
-    | '/app/prescriptions'
     | '/app/receptionists'
     | '/app/reports'
     | '/app/settings'
@@ -356,7 +352,11 @@ export interface FileRouteTypes {
     | '/app/patients/$id'
     | '/app/patients/new'
     | '/app/prescriptions/new'
+    | '/app/appointments/'
+    | '/app/billing/'
+    | '/app/clinics/'
     | '/app/patients/'
+    | '/app/prescriptions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -437,13 +437,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReceptionistsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prescriptions': {
-      id: '/app/prescriptions'
-      path: '/prescriptions'
-      fullPath: '/app/prescriptions'
-      preLoaderRoute: typeof AppPrescriptionsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/payments': {
       id: '/app/payments'
       path: '/payments'
@@ -486,20 +479,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDoctorsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/clinics': {
-      id: '/app/clinics'
-      path: '/clinics'
-      fullPath: '/app/clinics'
-      preLoaderRoute: typeof AppClinicsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/billing': {
-      id: '/app/billing'
-      path: '/billing'
-      fullPath: '/app/billing'
-      preLoaderRoute: typeof AppBillingRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/audit-logs': {
       id: '/app/audit-logs'
       path: '/audit-logs'
@@ -507,11 +486,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditLogsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/appointments': {
-      id: '/app/appointments'
-      path: '/appointments'
-      fullPath: '/app/appointments'
-      preLoaderRoute: typeof AppAppointmentsRouteImport
+    '/app/prescriptions/': {
+      id: '/app/prescriptions/'
+      path: '/prescriptions'
+      fullPath: '/app/prescriptions/'
+      preLoaderRoute: typeof AppPrescriptionsIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/patients/': {
@@ -521,12 +500,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPatientsIndexRouteImport
       parentRoute: typeof AppPatientsRoute
     }
+    '/app/clinics/': {
+      id: '/app/clinics/'
+      path: '/clinics'
+      fullPath: '/app/clinics/'
+      preLoaderRoute: typeof AppClinicsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/billing/': {
+      id: '/app/billing/'
+      path: '/billing'
+      fullPath: '/app/billing/'
+      preLoaderRoute: typeof AppBillingIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/appointments/': {
+      id: '/app/appointments/'
+      path: '/appointments'
+      fullPath: '/app/appointments/'
+      preLoaderRoute: typeof AppAppointmentsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/prescriptions/new': {
       id: '/app/prescriptions/new'
-      path: '/new'
+      path: '/prescriptions/new'
       fullPath: '/app/prescriptions/new'
       preLoaderRoute: typeof AppPrescriptionsNewRouteImport
-      parentRoute: typeof AppPrescriptionsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/patients/new': {
       id: '/app/patients/new'
@@ -544,63 +544,27 @@ declare module '@tanstack/react-router' {
     }
     '/app/clinics/new': {
       id: '/app/clinics/new'
-      path: '/new'
+      path: '/clinics/new'
       fullPath: '/app/clinics/new'
       preLoaderRoute: typeof AppClinicsNewRouteImport
-      parentRoute: typeof AppClinicsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/billing/new': {
       id: '/app/billing/new'
-      path: '/new'
+      path: '/billing/new'
       fullPath: '/app/billing/new'
       preLoaderRoute: typeof AppBillingNewRouteImport
-      parentRoute: typeof AppBillingRoute
+      parentRoute: typeof AppRoute
     }
     '/app/appointments/new': {
       id: '/app/appointments/new'
-      path: '/new'
+      path: '/appointments/new'
       fullPath: '/app/appointments/new'
       preLoaderRoute: typeof AppAppointmentsNewRouteImport
-      parentRoute: typeof AppAppointmentsRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
-
-interface AppAppointmentsRouteChildren {
-  AppAppointmentsNewRoute: typeof AppAppointmentsNewRoute
-}
-
-const AppAppointmentsRouteChildren: AppAppointmentsRouteChildren = {
-  AppAppointmentsNewRoute: AppAppointmentsNewRoute,
-}
-
-const AppAppointmentsRouteWithChildren = AppAppointmentsRoute._addFileChildren(
-  AppAppointmentsRouteChildren,
-)
-
-interface AppBillingRouteChildren {
-  AppBillingNewRoute: typeof AppBillingNewRoute
-}
-
-const AppBillingRouteChildren: AppBillingRouteChildren = {
-  AppBillingNewRoute: AppBillingNewRoute,
-}
-
-const AppBillingRouteWithChildren = AppBillingRoute._addFileChildren(
-  AppBillingRouteChildren,
-)
-
-interface AppClinicsRouteChildren {
-  AppClinicsNewRoute: typeof AppClinicsNewRoute
-}
-
-const AppClinicsRouteChildren: AppClinicsRouteChildren = {
-  AppClinicsNewRoute: AppClinicsNewRoute,
-}
-
-const AppClinicsRouteWithChildren = AppClinicsRoute._addFileChildren(
-  AppClinicsRouteChildren,
-)
 
 interface AppPatientsRouteChildren {
   AppPatientsIdRoute: typeof AppPatientsIdRoute
@@ -618,29 +582,14 @@ const AppPatientsRouteWithChildren = AppPatientsRoute._addFileChildren(
   AppPatientsRouteChildren,
 )
 
-interface AppPrescriptionsRouteChildren {
-  AppPrescriptionsNewRoute: typeof AppPrescriptionsNewRoute
-}
-
-const AppPrescriptionsRouteChildren: AppPrescriptionsRouteChildren = {
-  AppPrescriptionsNewRoute: AppPrescriptionsNewRoute,
-}
-
-const AppPrescriptionsRouteWithChildren =
-  AppPrescriptionsRoute._addFileChildren(AppPrescriptionsRouteChildren)
-
 interface AppRouteChildren {
-  AppAppointmentsRoute: typeof AppAppointmentsRouteWithChildren
   AppAuditLogsRoute: typeof AppAuditLogsRoute
-  AppBillingRoute: typeof AppBillingRouteWithChildren
-  AppClinicsRoute: typeof AppClinicsRouteWithChildren
   AppDoctorsRoute: typeof AppDoctorsRoute
   AppFilesRoute: typeof AppFilesRoute
   AppMedicalHistoryRoute: typeof AppMedicalHistoryRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPatientsRoute: typeof AppPatientsRouteWithChildren
   AppPaymentsRoute: typeof AppPaymentsRoute
-  AppPrescriptionsRoute: typeof AppPrescriptionsRouteWithChildren
   AppReceptionistsRoute: typeof AppReceptionistsRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -648,20 +597,24 @@ interface AppRouteChildren {
   AppSupportRoute: typeof AppSupportRoute
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppAppointmentsNewRoute: typeof AppAppointmentsNewRoute
+  AppBillingNewRoute: typeof AppBillingNewRoute
+  AppClinicsNewRoute: typeof AppClinicsNewRoute
+  AppPrescriptionsNewRoute: typeof AppPrescriptionsNewRoute
+  AppAppointmentsIndexRoute: typeof AppAppointmentsIndexRoute
+  AppBillingIndexRoute: typeof AppBillingIndexRoute
+  AppClinicsIndexRoute: typeof AppClinicsIndexRoute
+  AppPrescriptionsIndexRoute: typeof AppPrescriptionsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAppointmentsRoute: AppAppointmentsRouteWithChildren,
   AppAuditLogsRoute: AppAuditLogsRoute,
-  AppBillingRoute: AppBillingRouteWithChildren,
-  AppClinicsRoute: AppClinicsRouteWithChildren,
   AppDoctorsRoute: AppDoctorsRoute,
   AppFilesRoute: AppFilesRoute,
   AppMedicalHistoryRoute: AppMedicalHistoryRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppPatientsRoute: AppPatientsRouteWithChildren,
   AppPaymentsRoute: AppPaymentsRoute,
-  AppPrescriptionsRoute: AppPrescriptionsRouteWithChildren,
   AppReceptionistsRoute: AppReceptionistsRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
@@ -669,6 +622,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppSupportRoute: AppSupportRoute,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
+  AppAppointmentsNewRoute: AppAppointmentsNewRoute,
+  AppBillingNewRoute: AppBillingNewRoute,
+  AppClinicsNewRoute: AppClinicsNewRoute,
+  AppPrescriptionsNewRoute: AppPrescriptionsNewRoute,
+  AppAppointmentsIndexRoute: AppAppointmentsIndexRoute,
+  AppBillingIndexRoute: AppBillingIndexRoute,
+  AppClinicsIndexRoute: AppClinicsIndexRoute,
+  AppPrescriptionsIndexRoute: AppPrescriptionsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
