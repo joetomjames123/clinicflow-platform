@@ -1,0 +1,171 @@
+import { useState, type ReactNode } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Activity, Bell, LogOut, Menu, Moon, Search, Sun, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth, ROLE_LABELS, type Role } from "@/lib/auth";
+import { SidebarNav } from "./sidebar-nav";
+
+function ClinicMark({ initials }: { initials: string }) {
+  return (
+    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground font-display font-bold text-sm shadow-soft">
+      {initials}
+    </div>
+  );
+}
+
+function Brand() {
+  return (
+    <Link to="/app" className="flex items-center gap-2.5 px-4 h-16 border-b">
+      <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-info text-primary-foreground shadow-soft">
+        <Activity className="h-5 w-5" strokeWidth={2.5} />
+      </div>
+      <div className="leading-tight">
+        <div className="font-display font-bold text-base tracking-tight">ClinicFlow</div>
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Healthcare OS</div>
+      </div>
+    </Link>
+  );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const { user, logout, setRole } = useAuth();
+  const navigate = useNavigate();
+  const [dark, setDark] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", next);
+    }
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="min-h-screen w-full bg-background">
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r bg-sidebar">
+        <Brand />
+        <div className="flex-1 overflow-y-auto">
+          <SidebarNav />
+        </div>
+        <div className="border-t p-3">
+          <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/60 px-3 py-2.5">
+            <ClinicMark initials={user.clinicLogo} />
+            <div className="min-w-0">
+              <div className="truncate text-xs text-muted-foreground">Currently logged into</div>
+              <div className="truncate text-sm font-semibold">{user.clinic}</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile drawer */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-72 p-0">
+          <Brand />
+          <SidebarNav onNavigate={() => setMobileOpen(false)} />
+        </SheetContent>
+      </Sheet>
+
+      {/* Main */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <header className="sticky top-0 z-20 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur-md sm:px-6">
+          <div className="flex items-center gap-2">
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <div className="hidden lg:flex items-center gap-2">
+              <ClinicMark initials={user.clinicLogo} />
+              <div className="leading-tight">
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Clinic</div>
+                <div className="text-sm font-semibold truncate max-w-[180px]">{user.clinic}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative min-w-0">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search patients, doctors, phone or ID…"
+              className="h-10 w-full rounded-xl border-border/70 bg-muted/40 pl-9 focus-visible:bg-background"
+            />
+          </div>
+
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleDark} className="rounded-xl">
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button asChild variant="ghost" size="icon" className="relative rounded-xl">
+              <Link to="/app/notifications">
+                <Bell className="h-4 w-4" />
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
+              </Link>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-10 gap-2 rounded-xl px-2">
+                  <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-info text-primary-foreground text-xs font-semibold">
+                    {user.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <div className="hidden sm:block text-left leading-tight">
+                    <div className="text-sm font-semibold">{user.name.split(" ")[0]}</div>
+                    <div className="text-[10px] text-muted-foreground">{ROLE_LABELS[user.role]}</div>
+                  </div>
+                  <ChevronDown className="hidden sm:block h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>
+                  <div className="font-semibold">{user.name}</div>
+                  <div className="text-xs font-normal text-muted-foreground">{user.email}</div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Switch role (demo)
+                </DropdownMenuLabel>
+                {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
+                  <DropdownMenuItem key={r} onClick={() => setRole(r)}>
+                    <span className={user.role === r ? "font-semibold text-primary" : ""}>
+                      {ROLE_LABELS[r]}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => { logout(); navigate({ to: "/login" }); }}>
+                  <LogOut className="mr-2 h-4 w-4" /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        {/* Welcome strip */}
+        <div className="border-b bg-gradient-to-r from-primary-soft/40 via-background to-background px-4 py-3 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div className="text-sm text-muted-foreground">Welcome back,</div>
+              <div className="font-display text-lg font-bold tracking-tight">{user.name}</div>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Currently logged into <span className="font-semibold text-foreground">{user.clinic}</span>
+            </div>
+          </div>
+        </div>
+
+        <main className="px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+      </div>
+    </div>
+  );
+}
