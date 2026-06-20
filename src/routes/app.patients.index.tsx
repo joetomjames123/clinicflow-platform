@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { patients } from "@/lib/sample-data";
 import { Search, Plus } from "lucide-react";
 
-export const Route = createFileRoute("/app/patients")({ component: PatientsPage });
+export const Route = createFileRoute("/app/patients/")({ component: PatientsPage });
 
 function PatientsPage() {
   return (
