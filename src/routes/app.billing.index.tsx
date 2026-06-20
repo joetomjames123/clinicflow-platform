@@ -7,7 +7,7 @@ import { StatCard } from "@/components/layout/stat-card";
 import { bills } from "@/lib/sample-data";
 import { Receipt, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 
-export const Route = createFileRoute("/app/billing")({ component: BillingPage });
+export const Route = createFileRoute("/app/billing/")({ component: BillingPage });
 
 function BillingPage() {
   const paid = bills.filter(b => b.status === "Paid").reduce((s, b) => s + b.amount, 0);

@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { prescriptions } from "@/lib/sample-data";
 import { Plus, FileText } from "lucide-react";
 
-export const Route = createFileRoute("/app/prescriptions")({ component: PrescriptionsPage });
+export const Route = createFileRoute("/app/prescriptions/")({ component: PrescriptionsPage });
 
 function PrescriptionsPage() {
   return (
