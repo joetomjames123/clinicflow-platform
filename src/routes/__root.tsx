@@ -83,6 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Premium SaaS clinic management for clinics, doctors, receptionists and admins." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "ClinicFlow — Modern Clinic Management Platform" },
+      { name: "twitter:description", content: "Premium SaaS clinic management for clinics, doctors, receptionists and admins." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10485441-f923-4fa8-b160-2e8c6833be66/id-preview-b9c73cdd--7ff91c69-fbed-4396-9f6b-7ff81d517e2d.lovable.app-1781976657023.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10485441-f923-4fa8-b160-2e8c6833be66/id-preview-b9c73cdd--7ff91c69-fbed-4396-9f6b-7ff81d517e2d.lovable.app-1781976657023.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
