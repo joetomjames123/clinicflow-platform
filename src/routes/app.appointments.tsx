@@ -1,0 +1,89 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { appointments } from "@/lib/sample-data";
+import { CalendarDays, List, Plus } from "lucide-react";
+
+export const Route = createFileRoute("/app/appointments")({ component: AppointmentsPage });
+
+function CalendarView() {
+  const hours = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30"];
+  return (
+    <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">
+      <div className="min-w-[720px] grid grid-cols-[80px_repeat(5,1fr)]">
+        <div className="border-b border-r bg-muted/30 p-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time</div>
+        {["Mon 16", "Tue 17", "Wed 18", "Thu 19", "Fri 20"].map((d, i) => (
+          <div key={d} className={`border-b p-3 text-xs font-semibold ${i === 4 ? "text-primary" : ""}`}>{d}</div>
+        ))}
+        {hours.map((h) => (
+          <>
+            <div key={h} className="border-b border-r p-3 text-xs text-muted-foreground">{h}</div>
+            {Array.from({ length: 5 }).map((_, c) => {
+              const slot = appointments.find(a => a.time === h && c === 4);
+              return (
+                <div key={`${h}-${c}`} className="border-b p-1.5 min-h-14">
+                  {slot && (
+                    <div className="rounded-lg bg-primary-soft px-2 py-1.5 text-xs">
+                      <div className="font-semibold truncate text-primary">{slot.patient}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{slot.type}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AppointmentsPage() {
+  return (
+    <>
+      <PageHeader title="Appointments" description="Scheduling and check-ins."
+        actions={<Button asChild><Link to="/app/appointments/new"><Plus className="mr-1.5 h-4 w-4" />Book appointment</Link></Button>} />
+      <Tabs defaultValue="list">
+        <TabsList className="rounded-xl bg-muted/60 p-1">
+          <TabsTrigger value="list" className="rounded-lg"><List className="mr-1.5 h-3.5 w-3.5" />List</TabsTrigger>
+          <TabsTrigger value="calendar" className="rounded-lg"><CalendarDays className="mr-1.5 h-3.5 w-3.5" />Calendar</TabsTrigger>
+          <TabsTrigger value="upcoming" className="rounded-lg">Upcoming</TabsTrigger>
+        </TabsList>
+        <TabsContent value="list" className="mt-4 rounded-2xl border bg-card shadow-soft overflow-x-auto">
+          <Table>
+            <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Patient</TableHead><TableHead>Doctor</TableHead><TableHead>Date & time</TableHead><TableHead>Type</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <TableBody>
+              {appointments.map(a => (
+                <TableRow key={a.id}>
+                  <TableCell className="font-mono text-xs">{a.id}</TableCell>
+                  <TableCell className="font-semibold">{a.patient}</TableCell>
+                  <TableCell>{a.doctor}</TableCell>
+                  <TableCell>{a.date} · <span className="font-semibold">{a.time}</span></TableCell>
+                  <TableCell>{a.type}</TableCell>
+                  <TableCell><Badge variant={a.status === "Confirmed" ? "secondary" : a.status === "Checked-in" ? "default" : "outline"}>{a.status}</Badge></TableCell>
+                  <TableCell className="text-right"><Button size="sm" variant="ghost">Edit</Button></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TabsContent>
+        <TabsContent value="calendar" className="mt-4"><CalendarView /></TabsContent>
+        <TabsContent value="upcoming" className="mt-4 grid gap-3 sm:grid-cols-2">
+          {appointments.filter(a => a.status !== "Checked-in").slice(0, 6).map(a => (
+            <div key={a.id} className="rounded-2xl border bg-card p-4 shadow-soft">
+              <div className="flex items-center justify-between">
+                <div className="font-semibold">{a.patient}</div>
+                <Badge variant="secondary">{a.status}</Badge>
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">{a.doctor} · {a.type}</div>
+              <div className="mt-3 text-sm">{a.date} at <span className="font-semibold">{a.time}</span></div>
+            </div>
+          ))}
+        </TabsContent>
+      </Tabs>
+    </>
+  );
+}
