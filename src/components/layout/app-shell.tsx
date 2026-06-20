@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Activity, Bell, LogOut, Menu, Moon, Search, Sun, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -81,11 +81,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Top bar */}
         <header className="sticky top-0 z-20 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur-md sm:px-6">
           <div className="flex items-center gap-2">
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
             <div className="hidden lg:flex items-center gap-2">
               <ClinicMark initials={user.clinicLogo} />
               <div className="leading-tight">
