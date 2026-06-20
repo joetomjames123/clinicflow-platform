@@ -18,24 +18,22 @@ function CalendarView() {
         {["Mon 16", "Tue 17", "Wed 18", "Thu 19", "Fri 20"].map((d, i) => (
           <div key={d} className={`border-b p-3 text-xs font-semibold ${i === 4 ? "text-primary" : ""}`}>{d}</div>
         ))}
-        {hours.map((h) => (
-          <>
-            <div key={h} className="border-b border-r p-3 text-xs text-muted-foreground">{h}</div>
-            {Array.from({ length: 5 }).map((_, c) => {
-              const slot = appointments.find(a => a.time === h && c === 4);
-              return (
-                <div key={`${h}-${c}`} className="border-b p-1.5 min-h-14">
-                  {slot && (
-                    <div className="rounded-lg bg-primary-soft px-2 py-1.5 text-xs">
-                      <div className="font-semibold truncate text-primary">{slot.patient}</div>
-                      <div className="text-[10px] text-muted-foreground truncate">{slot.type}</div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </>
-        ))}
+        {hours.flatMap((h) => [
+          <div key={`t-${h}`} className="border-b border-r p-3 text-xs text-muted-foreground">{h}</div>,
+          ...Array.from({ length: 5 }).map((_, c) => {
+            const slot = appointments.find(a => a.time === h && c === 4);
+            return (
+              <div key={`${h}-${c}`} className="border-b p-1.5 min-h-14">
+                {slot && (
+                  <div className="rounded-lg bg-primary-soft px-2 py-1.5 text-xs">
+                    <div className="font-semibold truncate text-primary">{slot.patient}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">{slot.type}</div>
+                  </div>
+                )}
+              </div>
+            );
+          }),
+        ])}
       </div>
     </div>
   );
