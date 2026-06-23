@@ -4,8 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { patients } from "@/lib/sample-data";
+import { EntityPicker, patientOptions, type PatientOption } from "@/components/forms/entity-picker";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
