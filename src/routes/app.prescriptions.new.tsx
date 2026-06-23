@@ -99,9 +99,9 @@ function NewPrescription() {
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <div><div className="text-muted-foreground">Patient</div><div className="font-semibold">{patient.name}</div></div>
-              <div><div className="text-muted-foreground">Patient ID</div><div className="font-mono">{patient.id}</div></div>
-              <div><div className="text-muted-foreground">Age / Gender</div><div>{patient.age} · {patient.gender}</div></div>
+              <div><div className="text-muted-foreground">Patient</div><div className="font-semibold">{patient?.primary ?? "—"}</div></div>
+              <div><div className="text-muted-foreground">Patient ID</div><div className="font-mono">{patient?.id ?? "—"}</div></div>
+              <div><div className="text-muted-foreground">Age / Gender</div><div>{patient?.secondary ?? "—"}</div></div>
               <div><div className="text-muted-foreground">Date</div><div>{new Date().toISOString().slice(0, 10)}</div></div>
             </div>
             <div className="mt-4">
