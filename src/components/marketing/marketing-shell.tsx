@@ -99,9 +99,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Product</div>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
-                <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
-                <li><Link to="/request-demo" className="hover:text-foreground">Request demo</Link></li>
-                <li><Link to="/subscribe" className="hover:text-foreground">Get subscription</Link></li>
+                <li><Link to="/about" className="hover:text-foreground">About us</Link></li>
+                <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
               </ul>
             </div>
             <div>
