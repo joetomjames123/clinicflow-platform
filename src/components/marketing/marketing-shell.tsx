@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 const NAV = [
   { to: "/", label: "Home" },
   { to: "/features", label: "Features" },
-  { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
   { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
@@ -44,9 +43,6 @@ export function MarketingShell({ children }: { children: ReactNode }) {
             <Button asChild variant="ghost" className="rounded-xl">
               <Link to="/login">Sign in</Link>
             </Button>
-            <Button asChild className="rounded-xl shadow-soft">
-              <Link to="/request-demo">Request demo</Link>
-            </Button>
           </div>
           <button
             onClick={() => setOpen(!open)}
@@ -69,12 +65,9 @@ export function MarketingShell({ children }: { children: ReactNode }) {
                   {i.label}
                 </Link>
               ))}
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <Button asChild variant="outline" className="rounded-xl">
+              <div className="mt-2">
+                <Button asChild variant="outline" className="w-full rounded-xl">
                   <Link to="/login" onClick={() => setOpen(false)}>Sign in</Link>
-                </Button>
-                <Button asChild className="rounded-xl">
-                  <Link to="/request-demo" onClick={() => setOpen(false)}>Demo</Link>
                 </Button>
               </div>
             </div>
@@ -106,9 +99,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Product</div>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
-                <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
-                <li><Link to="/request-demo" className="hover:text-foreground">Request demo</Link></li>
-                <li><Link to="/subscribe" className="hover:text-foreground">Get subscription</Link></li>
+                <li><Link to="/about" className="hover:text-foreground">About us</Link></li>
+                <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
               </ul>
             </div>
             <div>

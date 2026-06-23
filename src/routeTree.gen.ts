@@ -9,9 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SubscribeRouteImport } from './routes/subscribe'
-import { Route as RequestDemoRouteImport } from './routes/request-demo'
-import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -49,21 +46,6 @@ import { Route as AppClinicsNewRouteImport } from './routes/app.clinics.new'
 import { Route as AppBillingNewRouteImport } from './routes/app.billing.new'
 import { Route as AppAppointmentsNewRouteImport } from './routes/app.appointments.new'
 
-const SubscribeRoute = SubscribeRouteImport.update({
-  id: '/subscribe',
-  path: '/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RequestDemoRoute = RequestDemoRouteImport.update({
-  id: '/request-demo',
-  path: '/request-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -253,9 +235,6 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
-  '/pricing': typeof PricingRoute
-  '/request-demo': typeof RequestDemoRoute
-  '/subscribe': typeof SubscribeRoute
   '/app/appointments': typeof AppAppointmentsRouteWithChildren
   '/app/audit-logs': typeof AppAuditLogsRoute
   '/app/billing': typeof AppBillingRouteWithChildren
@@ -293,9 +272,6 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
-  '/pricing': typeof PricingRoute
-  '/request-demo': typeof RequestDemoRoute
-  '/subscribe': typeof SubscribeRoute
   '/app/audit-logs': typeof AppAuditLogsRoute
   '/app/doctors': typeof AppDoctorsRoute
   '/app/files': typeof AppFilesRoute
@@ -330,9 +306,6 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
-  '/pricing': typeof PricingRoute
-  '/request-demo': typeof RequestDemoRoute
-  '/subscribe': typeof SubscribeRoute
   '/app/appointments': typeof AppAppointmentsRouteWithChildren
   '/app/audit-logs': typeof AppAuditLogsRoute
   '/app/billing': typeof AppBillingRouteWithChildren
@@ -373,9 +346,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/features'
     | '/login'
-    | '/pricing'
-    | '/request-demo'
-    | '/subscribe'
     | '/app/appointments'
     | '/app/audit-logs'
     | '/app/billing'
@@ -413,9 +383,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/features'
     | '/login'
-    | '/pricing'
-    | '/request-demo'
-    | '/subscribe'
     | '/app/audit-logs'
     | '/app/doctors'
     | '/app/files'
@@ -449,9 +416,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/features'
     | '/login'
-    | '/pricing'
-    | '/request-demo'
-    | '/subscribe'
     | '/app/appointments'
     | '/app/audit-logs'
     | '/app/billing'
@@ -491,34 +455,10 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   FeaturesRoute: typeof FeaturesRoute
   LoginRoute: typeof LoginRoute
-  PricingRoute: typeof PricingRoute
-  RequestDemoRoute: typeof RequestDemoRoute
-  SubscribeRoute: typeof SubscribeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/subscribe': {
-      id: '/subscribe'
-      path: '/subscribe'
-      fullPath: '/subscribe'
-      preLoaderRoute: typeof SubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/request-demo': {
-      id: '/request-demo'
-      path: '/request-demo'
-      fullPath: '/request-demo'
-      preLoaderRoute: typeof RequestDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -897,9 +837,6 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   FeaturesRoute: FeaturesRoute,
   LoginRoute: LoginRoute,
-  PricingRoute: PricingRoute,
-  RequestDemoRoute: RequestDemoRoute,
-  SubscribeRoute: SubscribeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

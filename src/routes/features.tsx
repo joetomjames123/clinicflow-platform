@@ -1,9 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   UsersRound, CalendarDays, FileText, Receipt, Shield, Stethoscope, FolderOpen,
-  BellRing, FileBarChart, ShieldCheck, Building2, Activity, ArrowRight,
+  BellRing, FileBarChart, ShieldCheck, Building2, Activity,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 
 export const Route = createFileRoute("/features")({
@@ -87,13 +86,10 @@ function Features() {
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="rounded-3xl border bg-gradient-to-br from-primary-soft/60 to-card p-10 text-center shadow-soft">
-          <h3 className="font-display text-2xl font-bold tracking-tight">See it in your clinic.</h3>
+          <h3 className="font-display text-2xl font-bold tracking-tight">Ready to simplify your clinic?</h3>
           <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-            Book a 20-minute personalized walkthrough with our team.
+            Log in to access your workspace and start managing patients, appointments and billing.
           </p>
-          <Button asChild className="mt-5 rounded-xl">
-            <Link to="/request-demo">Request a demo <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
-          </Button>
         </div>
       </section>
     </MarketingShell>
