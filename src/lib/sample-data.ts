@@ -29,11 +29,11 @@ export const appointments = [
 ];
 
 export const doctors = [
-  { id: "DR-01", name: "Dr. Amelia Chen", specialty: "General Medicine", patients: 412, status: "Active", email: "amelia.chen@northwood.health" },
-  { id: "DR-02", name: "Dr. Rahul Mehta", specialty: "Cardiology", patients: 287, status: "Active", email: "rahul.mehta@northwood.health" },
-  { id: "DR-03", name: "Dr. Ingrid Larsson", specialty: "Pediatrics", patients: 356, status: "Active", email: "ingrid.larsson@northwood.health" },
-  { id: "DR-04", name: "Dr. Tomás Silva", specialty: "Dermatology", patients: 198, status: "On Leave", email: "tomas.silva@northwood.health" },
-  { id: "DR-05", name: "Dr. Aisha Khan", specialty: "Endocrinology", patients: 221, status: "Active", email: "aisha.khan@northwood.health" },
+  { id: "DR-01", name: "Dr. Amelia Chen", specialty: "General Medicine", patients: 412, status: "Active", email: "amelia.chen@northwood.health", phone: "+46 70 884 1100" },
+  { id: "DR-02", name: "Dr. Rahul Mehta", specialty: "Cardiology", patients: 287, status: "Active", email: "rahul.mehta@northwood.health", phone: "+46 70 884 1101" },
+  { id: "DR-03", name: "Dr. Ingrid Larsson", specialty: "Pediatrics", patients: 356, status: "Active", email: "ingrid.larsson@northwood.health", phone: "+46 70 884 1102" },
+  { id: "DR-04", name: "Dr. Tomás Silva", specialty: "Dermatology", patients: 198, status: "On Leave", email: "tomas.silva@northwood.health", phone: "+46 70 884 1103" },
+  { id: "DR-05", name: "Dr. Aisha Khan", specialty: "Endocrinology", patients: 221, status: "Active", email: "aisha.khan@northwood.health", phone: "+46 70 884 1104" },
 ];
 
 export const receptionists = [
@@ -57,20 +57,22 @@ export const prescriptions = [
   { id: "RX-9824", patient: "Mateo Hernández", doctor: "Dr. Rahul Mehta", date: "2026-06-14", diagnosis: "Acute pharyngitis", medicines: 3 },
 ];
 
+export const SUBSCRIPTION_PRICE = 499; // ₹ per clinic per month
+
 export const subscriptions = [
-  { clinic: "Northwood Health", plan: "Pro", price: 249, renews: "2026-09-14", status: "Active", daysLeft: 86 },
-  { clinic: "Riverside Medical", plan: "Pro", price: 249, renews: "2026-08-02", status: "Active", daysLeft: 43 },
-  { clinic: "Aurora Family Clinic", plan: "Starter", price: 99, renews: "2026-07-21", status: "Active", daysLeft: 31 },
-  { clinic: "Greenfield Practice", plan: "Pro", price: 249, renews: "2026-06-27", status: "Expiring", daysLeft: 7 },
-  { clinic: "Bayview Wellness", plan: "Enterprise", price: 599, renews: "2027-01-10", status: "Active", daysLeft: 204 },
-  { clinic: "Heritage Family Care", plan: "Starter", price: 99, renews: "2026-05-30", status: "Expired", daysLeft: -21 },
+  { clinic: "Northwood Health", price: SUBSCRIPTION_PRICE, renews: "2026-09-14", status: "Active", daysLeft: 86 },
+  { clinic: "Riverside Medical", price: SUBSCRIPTION_PRICE, renews: "2026-08-02", status: "Active", daysLeft: 43 },
+  { clinic: "Aurora Family Clinic", price: SUBSCRIPTION_PRICE, renews: "2026-07-21", status: "Active", daysLeft: 31 },
+  { clinic: "Greenfield Practice", price: SUBSCRIPTION_PRICE, renews: "2026-06-27", status: "Expiring", daysLeft: 7 },
+  { clinic: "Bayview Wellness", price: SUBSCRIPTION_PRICE, renews: "2027-01-10", status: "Active", daysLeft: 204 },
+  { clinic: "Heritage Family Care", price: SUBSCRIPTION_PRICE, renews: "2026-05-30", status: "Expired", daysLeft: -21 },
 ];
 
 export const payments = [
-  { id: "PAY-30021", clinic: "Northwood Health", method: "Bank Transfer", amount: 249, txn: "TXN8829110", date: "2026-06-14", status: "Verified" },
-  { id: "PAY-30022", clinic: "Aurora Family Clinic", method: "Google Pay", amount: 99, txn: "GPAY772A11", date: "2026-06-15", status: "Pending" },
-  { id: "PAY-30023", clinic: "Greenfield Practice", method: "PhonePe", amount: 249, txn: "PP-991023", date: "2026-06-16", status: "Pending" },
-  { id: "PAY-30024", clinic: "Bayview Wellness", method: "Bank Transfer", amount: 599, txn: "TXN8830221", date: "2026-06-12", status: "Verified" },
+  { id: "PAY-30021", clinic: "Northwood Health", method: "UPI", amount: SUBSCRIPTION_PRICE, txn: "UPI8829110", date: "2026-06-14", status: "Verified" },
+  { id: "PAY-30022", clinic: "Aurora Family Clinic", method: "Google Pay", amount: SUBSCRIPTION_PRICE, txn: "GPAY772A11", date: "2026-06-15", status: "Pending" },
+  { id: "PAY-30023", clinic: "Greenfield Practice", method: "PhonePe", amount: SUBSCRIPTION_PRICE, txn: "PP-991023", date: "2026-06-16", status: "Pending" },
+  { id: "PAY-30024", clinic: "Bayview Wellness", method: "Bank Transfer", amount: SUBSCRIPTION_PRICE, txn: "TXN8830221", date: "2026-06-12", status: "Verified" },
 ];
 
 export const revenueByMonth = [

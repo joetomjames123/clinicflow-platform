@@ -161,7 +161,7 @@ function SuperAdminDashboard() {
             <div key={s.clinic} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:flex sm:flex-wrap sm:justify-between">
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold">{s.clinic}</div>
-                <div className="text-xs text-muted-foreground">{s.plan} · €{s.price}/mo · Renews {s.renews}</div>
+                <div className="text-xs text-muted-foreground">₹{s.price}/mo · Renews {s.renews}</div>
               </div>
               <Badge variant={s.status === "Expired" ? "destructive" : "secondary"}>
                 {s.daysLeft < 0 ? `Expired ${Math.abs(s.daysLeft)}d ago` : `${s.daysLeft} days left`}

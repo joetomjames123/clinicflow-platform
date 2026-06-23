@@ -24,8 +24,7 @@ function SubTable({ rows }: { rows: typeof subscriptions }) {
         <TableHeader>
           <TableRow>
             <TableHead>Clinic</TableHead>
-            <TableHead>Plan</TableHead>
-            <TableHead className="text-right">MRR</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
             <TableHead>Renews</TableHead>
             <TableHead>Status</TableHead>
             <TableHead></TableHead>
@@ -35,8 +34,7 @@ function SubTable({ rows }: { rows: typeof subscriptions }) {
           {rows.map((s) => (
             <TableRow key={s.clinic}>
               <TableCell className="font-semibold">{s.clinic}</TableCell>
-              <TableCell><Badge variant="outline">{s.plan}</Badge></TableCell>
-              <TableCell className="text-right tabular-nums">€{s.price}</TableCell>
+              <TableCell className="text-right tabular-nums">₹{s.price}</TableCell>
               <TableCell className="text-muted-foreground">{s.renews}</TableCell>
               <TableCell>{badgeFor(s.daysLeft)}</TableCell>
               <TableCell className="text-right">

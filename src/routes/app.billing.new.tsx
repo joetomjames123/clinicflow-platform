@@ -4,8 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { patients } from "@/lib/sample-data";
+import { EntityPicker, patientOptions, type PatientOption } from "@/components/forms/entity-picker";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -14,6 +13,7 @@ export const Route = createFileRoute("/app/billing/new")({ component: NewBill })
 function NewBill() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [patient, setPatient] = useState<PatientOption | null>(null);
   const [consult, setConsult] = useState(50);
   const [treatment, setTreatment] = useState(0);
   const [meds, setMeds] = useState(0);
@@ -22,17 +22,23 @@ function NewBill() {
   const subtotal = consult + treatment + meds;
   const total = Math.max(0, subtotal - discount) * (1 + tax / 100);
 
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!patient) { toast.error("Please select a patient"); return; }
+    toast.success("Bill created");
+    navigate({ to: "/app/billing" });
+  };
+
   return (
     <>
       <PageHeader title="Create bill" description="Issue an invoice to a patient." />
-      <form onSubmit={(e) => { e.preventDefault(); toast.success("Bill created"); navigate({ to: "/app/billing" }); }}
-        className="grid gap-6 lg:grid-cols-3">
+      <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <section className="rounded-2xl border bg-card p-6 shadow-soft space-y-4">
-            <div className="space-y-1.5"><Label>Patient</Label>
-              <Select><SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Select patient" /></SelectTrigger>
-                <SelectContent>{patients.map(p => <SelectItem key={p.id} value={p.id}>{p.name} — {p.id}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="space-y-1.5">
+              <Label>Patient <span className="text-destructive">*</span></Label>
+              <EntityPicker options={patientOptions} value={patient} onChange={setPatient}
+                placeholder="Search by name, patient ID or phone…" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5"><Label>Consultation fee (€)</Label><Input type="number" className="h-11 rounded-xl" value={consult} onChange={e => setConsult(+e.target.value)} /></div>
