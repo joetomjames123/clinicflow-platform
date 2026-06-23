@@ -6,13 +6,11 @@ const FAQ = [
   { q: "Which types of clinics is ClinicFlow built for?", a: "General, multi-specialty, dental, physiotherapy, dermatology, ENT, orthopedic, pediatric, ayurveda, homeopathy, diagnostic centers and private medical practices." },
   { q: "Is my patient data safe?", a: "Yes. ClinicFlow is ISO 27001 certified with end-to-end encryption, encrypted backups every 24 hours, and granular audit logs on every action." },
   { q: "Can multiple clinics share one account?", a: "Each clinic gets its own independent workspace. No clinic can ever view another clinic's data, even on the same platform." },
-  { q: "How long does onboarding take?", a: "Most clinics are fully live within a day. Our team helps migrate existing patient data and trains your staff free of charge." },
-  { q: "Do you support multiple users per clinic?", a: "Yes — unlimited doctors, receptionists and admins are included in every subscription." },
+  { q: "How long does onboarding take?", a: "Most clinics are fully live within a day. Our team helps migrate existing patient data and trains your staff." },
+  { q: "Do you support multiple users per clinic?", a: "Yes — you can add unlimited doctors, receptionists and admins to your clinic workspace." },
   { q: "What about prescriptions and invoices?", a: "Both are generated as branded PDFs with your clinic logo. You can preview, print or download instantly, or share on WhatsApp." },
   { q: "Can receptionists edit prescriptions?", a: "No. Receptionists can register patients, book appointments and create invoices, but only doctors can create or edit prescriptions." },
   { q: "What payment methods do you accept?", a: "UPI, bank transfer and all major Indian cards. Invoices include GST and are downloadable from your account." },
-  { q: "Is there a free trial?", a: "Yes — book a demo and we'll set up a 14-day trial workspace with your branding." },
-  { q: "Can I cancel anytime?", a: "Yes. You can cancel or pause your subscription from settings. Your clinic data is preserved and can be reactivated anytime." },
 ];
 
 export const Route = createFileRoute("/faq")({

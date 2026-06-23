@@ -1,9 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   UsersRound, CalendarDays, FileText, Receipt, Shield, Stethoscope, FolderOpen,
-  BellRing, FileBarChart, ShieldCheck, Building2, Activity, ArrowRight,
+  BellRing, FileBarChart, ShieldCheck, Building2, Activity,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 
 export const Route = createFileRoute("/features")({
