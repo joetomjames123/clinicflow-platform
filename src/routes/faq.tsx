@@ -17,7 +17,7 @@ export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
       { title: "FAQ — ClinicFlow" },
-      { name: "description", content: "Answers to common questions about ClinicFlow — pricing, onboarding, security and more." },
+      { name: "description", content: "Answers to common questions about ClinicFlow — onboarding, security and more." },
       { property: "og:title", content: "FAQ — ClinicFlow" },
       { property: "og:url", content: "https://pulse-clinic-pro.lovable.app/faq" },
     ],
