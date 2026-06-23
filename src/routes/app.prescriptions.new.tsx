@@ -4,9 +4,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { patients } from "@/lib/sample-data";
+import { EntityPicker, patientOptions, doctorOptions, type PatientOption, type DoctorOption } from "@/components/forms/entity-picker";
 import { useAuth } from "@/lib/auth";
 import { Activity, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,7 +18,8 @@ function NewPrescription() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [meds, setMeds] = useState<Med[]>([{ name: "Amoxicillin 500 mg", dosage: "1 tab", frequency: "3× per day", duration: "5 days" }]);
-  const [patient, setPatient] = useState(patients[0]);
+  const [patient, setPatient] = useState<PatientOption | null>(patientOptions[0]);
+  const [doctor, setDoctor] = useState<DoctorOption | null>(doctorOptions[0]);
   const [diagnosis, setDiagnosis] = useState("Seasonal allergic rhinitis");
   const [notes, setNotes] = useState("Rest and hydration. Avoid known triggers.");
   const [followup, setFollowup] = useState("");
@@ -27,20 +27,33 @@ function NewPrescription() {
   const update = (i: number, k: keyof Med, v: string) =>
     setMeds(meds.map((m, idx) => (idx === i ? { ...m, [k]: v } : m)));
 
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!patient) { toast.error("Please select a patient"); return; }
+    if (!doctor) { toast.error("Please select a doctor"); return; }
+    if (!diagnosis.trim()) { toast.error("Diagnosis is required"); return; }
+    if (meds.length === 0 || !meds[0].name.trim()) { toast.error("Add at least one medicine"); return; }
+    toast.success("Prescription saved");
+    navigate({ to: "/app/prescriptions" });
+  };
+
   return (
     <>
       <PageHeader title="New prescription" description="Compose and sign a prescription." />
       <div className="grid gap-6 lg:grid-cols-5">
-        <form onSubmit={(e) => { e.preventDefault(); toast.success("Prescription saved"); navigate({ to: "/app/prescriptions" }); }}
-          className="lg:col-span-3 space-y-6">
+        <form onSubmit={onSubmit} className="lg:col-span-3 space-y-6">
           <section className="rounded-2xl border bg-card p-6 shadow-soft space-y-4">
-            <div className="space-y-1.5"><Label>Patient</Label>
-              <Select value={patient.id} onValueChange={(v) => setPatient(patients.find(p => p.id === v) ?? patient)}>
-                <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
-                <SelectContent>{patients.map(p => <SelectItem key={p.id} value={p.id}>{p.name} — {p.id}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="space-y-1.5">
+              <Label>Patient <span className="text-destructive">*</span></Label>
+              <EntityPicker options={patientOptions} value={patient} onChange={setPatient}
+                placeholder="Search by name, patient ID or phone…" />
             </div>
-            <div className="space-y-1.5"><Label>Diagnosis</Label><Input className="h-11 rounded-xl" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} /></div>
+            <div className="space-y-1.5">
+              <Label>Doctor <span className="text-destructive">*</span></Label>
+              <EntityPicker options={doctorOptions} value={doctor} onChange={setDoctor}
+                placeholder="Search by name, doctor ID or phone…" />
+            </div>
+            <div className="space-y-1.5"><Label>Diagnosis <span className="text-destructive">*</span></Label><Input className="h-11 rounded-xl" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Treatment notes</Label><Textarea rows={3} className="rounded-xl" value={notes} onChange={e => setNotes(e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Follow-up date</Label><Input type="date" className="h-11 rounded-xl" value={followup} onChange={e => setFollowup(e.target.value)} /></div>
           </section>
