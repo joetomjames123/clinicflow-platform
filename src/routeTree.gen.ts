@@ -28,7 +28,9 @@ import { Route as AppPaymentsRouteImport } from './routes/app.payments'
 import { Route as AppPatientsRouteImport } from './routes/app.patients'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppMedicalHistoryRouteImport } from './routes/app.medical-history'
+import { Route as AppFollowupsRouteImport } from './routes/app.followups'
 import { Route as AppFilesRouteImport } from './routes/app.files'
+import { Route as AppDownloadsRouteImport } from './routes/app.downloads'
 import { Route as AppDoctorsRouteImport } from './routes/app.doctors'
 import { Route as AppClinicsRouteImport } from './routes/app.clinics'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
@@ -141,9 +143,19 @@ const AppMedicalHistoryRoute = AppMedicalHistoryRouteImport.update({
   path: '/medical-history',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFollowupsRoute = AppFollowupsRouteImport.update({
+  id: '/followups',
+  path: '/followups',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFilesRoute = AppFilesRouteImport.update({
   id: '/files',
   path: '/files',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDownloadsRoute = AppDownloadsRouteImport.update({
+  id: '/downloads',
+  path: '/downloads',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDoctorsRoute = AppDoctorsRouteImport.update({
@@ -240,7 +252,9 @@ export interface FileRoutesByFullPath {
   '/app/billing': typeof AppBillingRouteWithChildren
   '/app/clinics': typeof AppClinicsRouteWithChildren
   '/app/doctors': typeof AppDoctorsRoute
+  '/app/downloads': typeof AppDownloadsRoute
   '/app/files': typeof AppFilesRoute
+  '/app/followups': typeof AppFollowupsRoute
   '/app/medical-history': typeof AppMedicalHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/patients': typeof AppPatientsRouteWithChildren
@@ -274,7 +288,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/app/audit-logs': typeof AppAuditLogsRoute
   '/app/doctors': typeof AppDoctorsRoute
+  '/app/downloads': typeof AppDownloadsRoute
   '/app/files': typeof AppFilesRoute
+  '/app/followups': typeof AppFollowupsRoute
   '/app/medical-history': typeof AppMedicalHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/payments': typeof AppPaymentsRoute
@@ -311,7 +327,9 @@ export interface FileRoutesById {
   '/app/billing': typeof AppBillingRouteWithChildren
   '/app/clinics': typeof AppClinicsRouteWithChildren
   '/app/doctors': typeof AppDoctorsRoute
+  '/app/downloads': typeof AppDownloadsRoute
   '/app/files': typeof AppFilesRoute
+  '/app/followups': typeof AppFollowupsRoute
   '/app/medical-history': typeof AppMedicalHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/patients': typeof AppPatientsRouteWithChildren
@@ -351,7 +369,9 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/clinics'
     | '/app/doctors'
+    | '/app/downloads'
     | '/app/files'
+    | '/app/followups'
     | '/app/medical-history'
     | '/app/notifications'
     | '/app/patients'
@@ -385,7 +405,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/app/audit-logs'
     | '/app/doctors'
+    | '/app/downloads'
     | '/app/files'
+    | '/app/followups'
     | '/app/medical-history'
     | '/app/notifications'
     | '/app/payments'
@@ -421,7 +443,9 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/clinics'
     | '/app/doctors'
+    | '/app/downloads'
     | '/app/files'
+    | '/app/followups'
     | '/app/medical-history'
     | '/app/notifications'
     | '/app/patients'
@@ -592,11 +616,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMedicalHistoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/followups': {
+      id: '/app/followups'
+      path: '/followups'
+      fullPath: '/app/followups'
+      preLoaderRoute: typeof AppFollowupsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/files': {
       id: '/app/files'
       path: '/files'
       fullPath: '/app/files'
       preLoaderRoute: typeof AppFilesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/downloads': {
+      id: '/app/downloads'
+      path: '/downloads'
+      fullPath: '/app/downloads'
+      preLoaderRoute: typeof AppDownloadsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/doctors': {
@@ -791,7 +829,9 @@ interface AppRouteChildren {
   AppBillingRoute: typeof AppBillingRouteWithChildren
   AppClinicsRoute: typeof AppClinicsRouteWithChildren
   AppDoctorsRoute: typeof AppDoctorsRoute
+  AppDownloadsRoute: typeof AppDownloadsRoute
   AppFilesRoute: typeof AppFilesRoute
+  AppFollowupsRoute: typeof AppFollowupsRoute
   AppMedicalHistoryRoute: typeof AppMedicalHistoryRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPatientsRoute: typeof AppPatientsRouteWithChildren
@@ -812,7 +852,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppBillingRoute: AppBillingRouteWithChildren,
   AppClinicsRoute: AppClinicsRouteWithChildren,
   AppDoctorsRoute: AppDoctorsRoute,
+  AppDownloadsRoute: AppDownloadsRoute,
   AppFilesRoute: AppFilesRoute,
+  AppFollowupsRoute: AppFollowupsRoute,
   AppMedicalHistoryRoute: AppMedicalHistoryRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppPatientsRoute: AppPatientsRouteWithChildren,

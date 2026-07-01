@@ -1,10 +1,10 @@
 export const clinics = [
-  { id: "CL-001", name: "Northwood Health", city: "Stockholm, SE", doctors: 12, patients: 1840, plan: "Pro", status: "Active", expires: "2026-09-14" },
-  { id: "CL-002", name: "Riverside Medical", city: "Toronto, CA", doctors: 8, patients: 1210, plan: "Pro", status: "Active", expires: "2026-08-02" },
-  { id: "CL-003", name: "Aurora Family Clinic", city: "Oslo, NO", doctors: 5, patients: 620, plan: "Starter", status: "Active", expires: "2026-07-21" },
-  { id: "CL-004", name: "Greenfield Practice", city: "Manchester, UK", doctors: 6, patients: 880, plan: "Pro", status: "Expiring", expires: "2026-06-27" },
-  { id: "CL-005", name: "Bayview Wellness", city: "San Diego, US", doctors: 9, patients: 1450, plan: "Enterprise", status: "Active", expires: "2027-01-10" },
-  { id: "CL-006", name: "Heritage Family Care", city: "Dublin, IE", doctors: 4, patients: 510, plan: "Starter", status: "Expired", expires: "2026-05-30" },
+  { id: "CL-001", name: "Northwood Health", city: "Stockholm, SE", doctors: 12, receptionists: 5, patients: 1840, plan: "Pro", status: "Active", expires: "2026-09-14" },
+  { id: "CL-002", name: "Riverside Medical", city: "Toronto, CA", doctors: 8, receptionists: 3, patients: 1210, plan: "Pro", status: "Active", expires: "2026-08-02" },
+  { id: "CL-003", name: "Aurora Family Clinic", city: "Oslo, NO", doctors: 5, receptionists: 2, patients: 620, plan: "Starter", status: "Active", expires: "2026-07-21" },
+  { id: "CL-004", name: "Greenfield Practice", city: "Manchester, UK", doctors: 6, receptionists: 2, patients: 880, plan: "Pro", status: "Expiring", expires: "2026-06-27" },
+  { id: "CL-005", name: "Bayview Wellness", city: "San Diego, US", doctors: 9, receptionists: 4, patients: 1450, plan: "Enterprise", status: "Active", expires: "2027-01-10" },
+  { id: "CL-006", name: "Heritage Family Care", city: "Dublin, IE", doctors: 4, receptionists: 2, patients: 510, plan: "Starter", status: "Expired", expires: "2026-05-30" },
 ];
 
 export const patients = [
@@ -50,12 +50,62 @@ export const bills = [
   { id: "INV-2026-0416", patient: "Olivia Kowalski", date: "2026-06-02", amount: 175.0, status: "Overdue", method: "—" },
 ];
 
-export const prescriptions = [
-  { id: "RX-9821", patient: "Liam Andersson", doctor: "Dr. Amelia Chen", date: "2026-06-12", diagnosis: "Seasonal allergic rhinitis", medicines: 3 },
-  { id: "RX-9822", patient: "Emma Bauer", doctor: "Dr. Amelia Chen", date: "2026-06-15", diagnosis: "Mild iron-deficiency anemia", medicines: 2 },
-  { id: "RX-9823", patient: "Sophia Romano", doctor: "Dr. Amelia Chen", date: "2026-06-08", diagnosis: "Hypertension stage 1", medicines: 2 },
-  { id: "RX-9824", patient: "Mateo Hernández", doctor: "Dr. Rahul Mehta", date: "2026-06-14", diagnosis: "Acute pharyngitis", medicines: 3 },
+export type PrescriptionMed = { name: string; dosage: string; frequency: string; duration: string; unitPrice?: number };
+export type Prescription = {
+  id: string; patient: string; patientId: string; doctor: string; date: string;
+  diagnosis: string; notes?: string; followUp?: string; medicines: PrescriptionMed[];
+};
+
+export const prescriptions: Prescription[] = [
+  { id: "RX-9821", patient: "Liam Andersson", patientId: "PT-10293", doctor: "Dr. Amelia Chen", date: "2026-06-12", diagnosis: "Seasonal allergic rhinitis", notes: "Rest and hydration.", followUp: "2026-06-26",
+    medicines: [
+      { name: "Cetirizine 10mg", dosage: "1 tab", frequency: "1× per day", duration: "7 days", unitPrice: 45 },
+      { name: "Fluticasone nasal spray", dosage: "2 puffs", frequency: "1× per day", duration: "14 days", unitPrice: 320 },
+      { name: "Montelukast 10mg", dosage: "1 tab", frequency: "1× per day", duration: "10 days", unitPrice: 180 },
+    ] },
+  { id: "RX-9822", patient: "Emma Bauer", patientId: "PT-10294", doctor: "Dr. Amelia Chen", date: "2026-06-15", diagnosis: "Mild iron-deficiency anemia", followUp: "2026-07-15",
+    medicines: [
+      { name: "Ferrous sulphate 200mg", dosage: "1 tab", frequency: "2× per day", duration: "30 days", unitPrice: 60 },
+      { name: "Vitamin C 500mg", dosage: "1 tab", frequency: "1× per day", duration: "30 days", unitPrice: 85 },
+    ] },
+  { id: "RX-9823", patient: "Sophia Romano", patientId: "PT-10296", doctor: "Dr. Amelia Chen", date: "2026-06-08", diagnosis: "Hypertension stage 1", followUp: "2026-07-08",
+    medicines: [
+      { name: "Amlodipine 5mg", dosage: "1 tab", frequency: "1× per day", duration: "30 days", unitPrice: 90 },
+      { name: "Losartan 50mg", dosage: "1 tab", frequency: "1× per day", duration: "30 days", unitPrice: 110 },
+    ] },
+  { id: "RX-9824", patient: "Mateo Hernández", patientId: "PT-10297", doctor: "Dr. Rahul Mehta", date: "2026-06-14", diagnosis: "Acute pharyngitis", followUp: "2026-06-21",
+    medicines: [
+      { name: "Amoxicillin 500mg", dosage: "1 cap", frequency: "3× per day", duration: "5 days", unitPrice: 55 },
+      { name: "Paracetamol 500mg", dosage: "1 tab", frequency: "3× per day", duration: "5 days", unitPrice: 20 },
+      { name: "Betadine gargle", dosage: "15 ml", frequency: "3× per day", duration: "5 days", unitPrice: 95 },
+    ] },
 ];
+
+export type LabReport = {
+  id: string; prescriptionId?: string; patient: string; patientId: string;
+  test: string; date: string; result: string; reference: string; notes?: string;
+  fileName?: string; uploadedBy: string;
+};
+
+export const labReports: LabReport[] = [
+  { id: "LR-2201", prescriptionId: "RX-9822", patient: "Emma Bauer", patientId: "PT-10294", test: "Complete Blood Count", date: "2026-06-15", result: "Hb 10.2 g/dL", reference: "12.0 – 15.5 g/dL", notes: "Low Hb — iron supplementation started.", uploadedBy: "Sofia Romero" },
+  { id: "LR-2202", prescriptionId: "RX-9823", patient: "Sophia Romano", patientId: "PT-10296", test: "Lipid Profile", date: "2026-06-08", result: "LDL 148 mg/dL", reference: "< 130 mg/dL", notes: "Borderline high.", uploadedBy: "Dr. Amelia Chen" },
+  { id: "LR-2203", prescriptionId: "RX-9821", patient: "Liam Andersson", patientId: "PT-10293", test: "Allergy Panel IgE", date: "2026-06-12", result: "Pollen +++, Dust ++", reference: "Negative", fileName: "allergy-panel.pdf", uploadedBy: "Sofia Romero" },
+];
+
+export type FollowUp = {
+  id: string; patient: string; patientId: string; doctor: string;
+  date: string; reason: string; status: "Pending" | "Done" | "Rescheduled";
+};
+
+export const followUps: FollowUp[] = prescriptions
+  .filter(p => p.followUp)
+  .map((p, i) => ({
+    id: `FU-${400 + i}`,
+    patient: p.patient, patientId: p.patientId, doctor: p.doctor,
+    date: p.followUp!, reason: p.diagnosis,
+    status: (i === 1 ? "Done" : "Pending") as "Pending" | "Done",
+  }));
 
 export const SUBSCRIPTION_PRICE = 499; // ₹ per clinic per month
 
@@ -76,22 +126,13 @@ export const payments = [
 ];
 
 export const revenueByMonth = [
-  { month: "Jan", revenue: 21400 },
-  { month: "Feb", revenue: 24800 },
-  { month: "Mar", revenue: 26900 },
-  { month: "Apr", revenue: 28500 },
-  { month: "May", revenue: 31200 },
-  { month: "Jun", revenue: 34750 },
+  { month: "Jan", revenue: 21400 }, { month: "Feb", revenue: 24800 }, { month: "Mar", revenue: 26900 },
+  { month: "Apr", revenue: 28500 }, { month: "May", revenue: 31200 }, { month: "Jun", revenue: 34750 },
 ];
 
 export const visitsByWeek = [
-  { day: "Mon", visits: 42 },
-  { day: "Tue", visits: 51 },
-  { day: "Wed", visits: 47 },
-  { day: "Thu", visits: 58 },
-  { day: "Fri", visits: 63 },
-  { day: "Sat", visits: 38 },
-  { day: "Sun", visits: 12 },
+  { day: "Mon", visits: 42 }, { day: "Tue", visits: 51 }, { day: "Wed", visits: 47 },
+  { day: "Thu", visits: 58 }, { day: "Fri", visits: 63 }, { day: "Sat", visits: 38 }, { day: "Sun", visits: 12 },
 ];
 
 export const auditLogs = [
@@ -106,7 +147,7 @@ export const auditLogs = [
 export const notifications = [
   { type: "warning", title: "Greenfield Practice subscription expires in 7 days", time: "2h ago" },
   { type: "destructive", title: "Heritage Family Care subscription expired", time: "1d ago" },
-  { type: "info", title: "Payment verification: Aurora Family Clinic (€99)", time: "3h ago" },
-  { type: "info", title: "Payment verification: Greenfield Practice (€249)", time: "5h ago" },
-  { type: "success", title: "Bayview Wellness renewed Enterprise plan", time: "Yesterday" },
+  { type: "info", title: "Payment verification: Aurora Family Clinic (₹499)", time: "3h ago" },
+  { type: "info", title: "Payment verification: Greenfield Practice (₹499)", time: "5h ago" },
+  { type: "success", title: "Bayview Wellness renewed plan", time: "Yesterday" },
 ];

@@ -1,23 +1,70 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { doctors, receptionists } from "@/lib/sample-data";
+import { useAuth } from "@/lib/auth";
+import { UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/users")({ component: UsersPage });
 
+type Row = { id: string; name: string; email: string; role: string; status: string };
+
 function UsersPage() {
-  const all = [
+  const { user } = useAuth();
+  const isSuper = user?.role === "super_admin";
+  const isClinicAdmin = user?.role === "clinic_admin";
+
+  const initial: Row[] = [
     ...doctors.map(d => ({ id: d.id, name: d.name, email: d.email, role: "Doctor", status: d.status })),
     ...receptionists.map(r => ({ id: r.id, name: r.name, email: r.email, role: "Receptionist", status: r.status })),
     { id: "AD-01", name: "Marcus Lindqvist", email: "marcus@northwood.health", role: "Clinic Admin", status: "Active" },
     { id: "SA-01", name: "Helena Vance", email: "helena@clinicflow.io", role: "Super Admin", status: "Active" },
   ];
+
+  const [rows, setRows] = useState<Row[]>(initial);
+  const [inviteRole, setInviteRole] = useState<"Super Admin" | "Clinic Admin" | null>(null);
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+
+  const submit = () => {
+    if (!form.name.trim() || !form.email.trim()) { toast.error("Name and email are required"); return; }
+    const prefix = inviteRole === "Super Admin" ? "SA" : "AD";
+    const nextId = `${prefix}-${String(rows.filter(r => r.id.startsWith(prefix)).length + 1).padStart(2, "0")}`;
+    setRows([{ id: nextId, name: form.name, email: form.email, role: inviteRole!, status: "Invited" }, ...rows]);
+    toast.success(`Invitation sent to ${form.email}`);
+    setInviteRole(null);
+    setForm({ name: "", email: "", phone: "" });
+  };
+
   return (
     <>
       <PageHeader title="Users" description="Everyone with access to the platform."
-        actions={<Button>Invite user</Button>} />
+        actions={
+          <div className="flex gap-2">
+            {isSuper && (
+              <Dialog open={inviteRole === "Super Admin"} onOpenChange={(o) => setInviteRole(o ? "Super Admin" : null)}>
+                <DialogTrigger asChild>
+                  <Button variant="outline"><UserPlus className="mr-1.5 h-4 w-4" />Invite Super Admin</Button>
+                </DialogTrigger>
+                <InviteDialog title="Invite Super Admin" form={form} setForm={setForm} onSubmit={submit} />
+              </Dialog>
+            )}
+            {(isClinicAdmin || isSuper) && (
+              <Dialog open={inviteRole === "Clinic Admin"} onOpenChange={(o) => setInviteRole(o ? "Clinic Admin" : null)}>
+                <DialogTrigger asChild>
+                  <Button><UserPlus className="mr-1.5 h-4 w-4" />Invite Clinic Admin</Button>
+                </DialogTrigger>
+                <InviteDialog title="Invite Clinic Admin" form={form} setForm={setForm} onSubmit={submit} />
+              </Dialog>
+            )}
+          </div>
+        } />
       <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">
         <Table>
           <TableHeader>
@@ -29,7 +76,7 @@ function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {all.map(u => (
+            {rows.map(u => (
               <TableRow key={u.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -51,5 +98,32 @@ function UsersPage() {
         </Table>
       </div>
     </>
+  );
+}
+
+function InviteDialog({ title, form, setForm, onSubmit }: {
+  title: string;
+  form: { name: string; email: string; phone: string };
+  setForm: (v: { name: string; email: string; phone: string }) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <DialogContent className="max-w-md">
+      <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+      <div className="space-y-3">
+        <div className="space-y-1.5"><Label>Full name</Label>
+          <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-11 rounded-xl" />
+        </div>
+        <div className="space-y-1.5"><Label>Email</Label>
+          <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-11 rounded-xl" />
+        </div>
+        <div className="space-y-1.5"><Label>Phone (optional)</Label>
+          <Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="h-11 rounded-xl" />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button onClick={onSubmit} className="w-full">Send invitation</Button>
+      </DialogFooter>
+    </DialogContent>
   );
 }

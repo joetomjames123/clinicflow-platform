@@ -250,7 +250,10 @@ function ClinicSettings() {
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-4 rounded-2xl border bg-card p-6 shadow-soft space-y-4">
-          {["New appointment booked","Payment received","Subscription expiring","Patient signed prescription"].map(t => (
+          {(user?.role === "doctor"
+            ? ["New appointment booked", "Patient signed prescription", "Follow-up reminder", "Lab report uploaded"]
+            : ["New appointment booked", "Payment received", "Subscription expiring", "Subscription expired", "Patient signed prescription"]
+          ).map(t => (
             <div key={t} className="flex items-center justify-between border-b last:border-0 pb-3 last:pb-0">
               <div className="text-sm font-medium">{t}</div>
               <Switch defaultChecked />
