@@ -4,16 +4,46 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { clinics } from "@/lib/sample-data";
-import { Search, Plus, MoreHorizontal } from "lucide-react";
+import { clinics, doctors, receptionists, patients } from "@/lib/sample-data";
+import { Search, Plus, Download } from "lucide-react";
+import { downloadCSV } from "@/lib/exporters";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/clinics/")({ component: ClinicsPage });
 
 function ClinicsPage() {
+  const exportClinic = (c: typeof clinics[number]) => {
+    const summary = [{
+      clinicId: c.id, clinicName: c.name, city: c.city,
+      doctors: c.doctors, receptionists: c.receptionists, patients: c.patients,
+      plan: c.plan, status: c.status, renews: c.expires,
+    }];
+    downloadCSV(`${c.id}-summary.csv`, summary);
+    downloadCSV(`${c.id}-doctors.csv`, doctors);
+    downloadCSV(`${c.id}-receptionists.csv`, receptionists);
+    downloadCSV(`${c.id}-patients.csv`, patients);
+    toast.success(`Exported ${c.name} · logged in audit`);
+  };
+
+  const exportAll = () => {
+    const combined = clinics.map(c => ({
+      clinicId: c.id, clinicName: c.name, city: c.city,
+      doctors: c.doctors, receptionists: c.receptionists, patients: c.patients,
+      plan: c.plan, status: c.status, renews: c.expires,
+    }));
+    downloadCSV("clinicflow-all-clinics.csv", combined);
+    toast.success("Exported all clinics · logged in audit");
+  };
+
   return (
     <>
       <PageHeader title="Clinics" description="All clinics on ClinicFlow."
-        actions={<Button asChild><Link to="/app/clinics/new"><Plus className="mr-1.5 h-4 w-4" /> Add Clinic</Link></Button>} />
+        actions={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportAll}><Download className="mr-1.5 h-4 w-4" />Download all</Button>
+            <Button asChild><Link to="/app/clinics/new"><Plus className="mr-1.5 h-4 w-4" /> Add Clinic</Link></Button>
+          </div>
+        } />
       <div className="rounded-2xl border bg-card shadow-soft">
         <div className="flex flex-wrap items-center gap-3 border-b p-4">
           <div className="relative min-w-[240px] flex-1">
@@ -21,7 +51,6 @@ function ClinicsPage() {
             <Input placeholder="Search clinics, cities…" className="h-10 rounded-xl bg-muted/30 pl-9" />
           </div>
           <Button variant="outline">Filter</Button>
-          <Button variant="outline">Export</Button>
         </div>
         <div className="overflow-x-auto">
           <Table>
@@ -29,12 +58,12 @@ function ClinicsPage() {
               <TableRow>
                 <TableHead>Clinic</TableHead>
                 <TableHead>Location</TableHead>
-                <TableHead>Plan</TableHead>
                 <TableHead className="text-right">Doctors</TableHead>
+                <TableHead className="text-right">Receptionists</TableHead>
                 <TableHead className="text-right">Patients</TableHead>
                 <TableHead>Renews</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead></TableHead>
+                <TableHead className="text-right">Export</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -52,8 +81,8 @@ function ClinicsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{c.city}</TableCell>
-                  <TableCell><Badge variant="outline">{c.plan}</Badge></TableCell>
                   <TableCell className="text-right tabular-nums">{c.doctors}</TableCell>
+                  <TableCell className="text-right tabular-nums">{c.receptionists}</TableCell>
                   <TableCell className="text-right tabular-nums">{c.patients.toLocaleString()}</TableCell>
                   <TableCell className="text-muted-foreground">{c.expires}</TableCell>
                   <TableCell>
@@ -61,7 +90,11 @@ function ClinicsPage() {
                       {c.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right"><Button size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button></TableCell>
+                  <TableCell className="text-right">
+                    <Button size="sm" variant="ghost" onClick={() => exportClinic(c)}>
+                      <Download className="mr-1 h-3.5 w-3.5" />CSV
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

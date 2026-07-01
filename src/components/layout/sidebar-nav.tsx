@@ -1,8 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Building2, Users, CreditCard, Wallet, FileBarChart, Settings,
-  Stethoscope, UserCog, UsersRound, CalendarDays, Receipt, FileText, ClipboardList,
-  FolderOpen, ShieldCheck, LifeBuoy, BellRing, Plus, Activity,
+  Stethoscope, UserCog, UsersRound, CalendarDays, Receipt, FileText,
+  FolderOpen, ShieldCheck, LifeBuoy, BellRing, Plus, CalendarClock, Download, FlaskConical,
 } from "lucide-react";
 import { useAuth, type Role } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,8 @@ const NAV: Record<Role, NavSection[]> = {
       { to: "/app/payments", label: "Payments", icon: Wallet },
       { to: "/app/users", label: "Users", icon: Users },
     ]},
-    { label: "Insights", items: [
+    { label: "Data", items: [
+      { to: "/app/downloads", label: "Download Center", icon: Download },
       { to: "/app/reports", label: "Reports", icon: FileBarChart },
       { to: "/app/audit-logs", label: "Audit Logs", icon: ShieldCheck },
     ]},
@@ -40,13 +41,16 @@ const NAV: Record<Role, NavSection[]> = {
       { to: "/app/doctors", label: "Doctors", icon: Stethoscope },
       { to: "/app/receptionists", label: "Receptionists", icon: UserCog },
       { to: "/app/patients", label: "Patients", icon: UsersRound },
+      { to: "/app/users", label: "Users", icon: Users },
     ]},
     { label: "Clinic", items: [
       { to: "/app/appointments", label: "Appointments", icon: CalendarDays },
+      { to: "/app/prescriptions", label: "Prescriptions", icon: FileText },
       { to: "/app/billing", label: "Billing", icon: Receipt },
       { to: "/app/files", label: "Files", icon: FolderOpen },
     ]},
-    { label: "Insights", items: [
+    { label: "Data", items: [
+      { to: "/app/downloads", label: "Download Center", icon: Download },
       { to: "/app/reports", label: "Reports", icon: FileBarChart },
       { to: "/app/audit-logs", label: "Audit Logs", icon: ShieldCheck },
     ]},
@@ -61,9 +65,12 @@ const NAV: Record<Role, NavSection[]> = {
     ]},
     { label: "Care", items: [
       { to: "/app/patients", label: "Patients", icon: UsersRound },
-      { to: "/app/medical-history", label: "Medical History", icon: Activity },
-      { to: "/app/prescriptions", label: "Prescriptions", icon: FileText },
       { to: "/app/appointments", label: "Appointments", icon: CalendarDays },
+      { to: "/app/prescriptions", label: "Prescriptions", icon: FileText },
+      { to: "/app/followups", label: "Follow-ups", icon: CalendarClock },
+    ]},
+    { label: "Data", items: [
+      { to: "/app/downloads", label: "Download Center", icon: Download },
     ]},
     { label: "Account", items: [
       { to: "/app/settings", label: "Settings", icon: Settings },
@@ -78,7 +85,12 @@ const NAV: Record<Role, NavSection[]> = {
       { to: "/app/patients/new", label: "Register Patient", icon: Plus },
       { to: "/app/patients", label: "Patient List", icon: UsersRound },
       { to: "/app/appointments", label: "Appointments", icon: CalendarDays },
+      { to: "/app/prescriptions", label: "Prescriptions", icon: FileText },
       { to: "/app/billing", label: "Billing", icon: Receipt },
+      { to: "/app/files", label: "Lab Reports", icon: FlaskConical },
+    ]},
+    { label: "Data", items: [
+      { to: "/app/downloads", label: "Download Center", icon: Download },
     ]},
     { label: "Account", items: [
       { to: "/app/settings", label: "Settings", icon: Settings },
