@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,82 +7,212 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EntityPicker, patientOptions, doctorOptions, type PatientOption, type DoctorOption } from "@/components/forms/entity-picker";
 import { useAuth } from "@/lib/auth";
-import { Activity, Plus, Trash2 } from "lucide-react";
+import { prescriptions as SEED, labReports as SEED_LABS, type LabReport } from "@/lib/sample-data";
+import { Activity, Plus, Trash2, Send, Printer, FlaskConical, Upload } from "lucide-react";
+import { sendWhatsApp } from "@/lib/whatsapp";
+import { printDocument } from "@/lib/exporters";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/app/prescriptions/new")({ component: NewPrescription });
+export const Route = createFileRoute("/app/prescriptions/new")({
+  component: NewPrescription,
+  validateSearch: (s: Record<string, unknown>) => ({ edit: typeof s.edit === "string" ? s.edit : undefined }),
+});
 
 type Med = { name: string; dosage: string; frequency: string; duration: string };
 
 function NewPrescription() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [meds, setMeds] = useState<Med[]>([{ name: "Amoxicillin 500 mg", dosage: "1 tab", frequency: "3× per day", duration: "5 days" }]);
-  const [patient, setPatient] = useState<PatientOption | null>(patientOptions[0]);
-  const [doctor, setDoctor] = useState<DoctorOption | null>(doctorOptions[0]);
-  const [diagnosis, setDiagnosis] = useState("Seasonal allergic rhinitis");
-  const [notes, setNotes] = useState("Rest and hydration. Avoid known triggers.");
-  const [followup, setFollowup] = useState("");
+  const { edit } = Route.useSearch();
+  const isReceptionist = user?.role === "receptionist";
+
+  const seed = useMemo(() => edit ? SEED.find(p => p.id === edit) : undefined, [edit]);
+
+  const [patient, setPatient] = useState<PatientOption | null>(
+    seed ? patientOptions.find(p => p.id === seed.patientId) ?? patientOptions[0] : patientOptions[0]
+  );
+  const [doctor, setDoctor] = useState<DoctorOption | null>(
+    seed ? doctorOptions.find(d => d.raw.name === seed.doctor) ?? doctorOptions[0] : doctorOptions[0]
+  );
+  const [diagnosis, setDiagnosis] = useState(seed?.diagnosis ?? "Seasonal allergic rhinitis");
+  const [notes, setNotes] = useState(seed?.notes ?? "Rest and hydration. Avoid known triggers.");
+  const [followup, setFollowup] = useState(seed?.followUp ?? "");
+  const [meds, setMeds] = useState<Med[]>(
+    seed?.medicines.map(m => ({ name: m.name, dosage: m.dosage, frequency: m.frequency, duration: m.duration })) ??
+    [{ name: "Amoxicillin 500 mg", dosage: "1 tab", frequency: "3× per day", duration: "5 days" }]
+  );
+  const [labs, setLabs] = useState<LabReport[]>(
+    edit ? SEED_LABS.filter(l => l.prescriptionId === edit) : []
+  );
+  const [newLab, setNewLab] = useState({ test: "", result: "", reference: "", notes: "" });
 
   const update = (i: number, k: keyof Med, v: string) =>
     setMeds(meds.map((m, idx) => (idx === i ? { ...m, [k]: v } : m)));
 
+  const addLab = () => {
+    if (!newLab.test.trim()) { toast.error("Test name required"); return; }
+    const id = `LR-${2300 + labs.length + 1}`;
+    setLabs([...labs, {
+      id, prescriptionId: edit ?? "RX-DRAFT",
+      patient: patient?.primary ?? "", patientId: patient?.id ?? "",
+      test: newLab.test, date: new Date().toISOString().slice(0, 10),
+      result: newLab.result, reference: newLab.reference, notes: newLab.notes,
+      uploadedBy: user?.name ?? "User",
+    }]);
+    setNewLab({ test: "", result: "", reference: "", notes: "" });
+    toast.success("Lab report added");
+  };
+
+  const uploadLab = (file: File) => {
+    const id = `LR-${2300 + labs.length + 1}`;
+    setLabs([...labs, {
+      id, prescriptionId: edit ?? "RX-DRAFT",
+      patient: patient?.primary ?? "", patientId: patient?.id ?? "",
+      test: file.name.replace(/\.[^.]+$/, ""), date: new Date().toISOString().slice(0, 10),
+      result: "Attached PDF", reference: "See attached", fileName: file.name,
+      uploadedBy: user?.name ?? "User",
+    }]);
+    toast.success(`Uploaded ${file.name}`);
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isReceptionist) return; // guard
     if (!patient) { toast.error("Please select a patient"); return; }
     if (!doctor) { toast.error("Please select a doctor"); return; }
     if (!diagnosis.trim()) { toast.error("Diagnosis is required"); return; }
     if (meds.length === 0 || !meds[0].name.trim()) { toast.error("Add at least one medicine"); return; }
-    toast.success("Prescription saved");
+    toast.success(edit ? "Prescription updated" : "Prescription saved");
     navigate({ to: "/app/prescriptions" });
+  };
+
+  const printRx = () => {
+    printDocument(`
+      <h2>${user?.clinic ?? "ClinicFlow"}</h2>
+      <div class="muted">Prescription · ${new Date().toLocaleDateString()}</div>
+      <div class="card">
+        <div class="row"><b>Patient</b><span>${patient?.primary ?? "—"} (${patient?.id ?? ""})</span></div>
+        <div class="row"><b>Doctor</b><span>${doctor?.primary ?? "—"}</span></div>
+        <div class="row"><b>Diagnosis</b><span>${diagnosis}</span></div>
+        ${followup ? `<div class="row"><b>Follow-up</b><span>${followup}</span></div>` : ""}
+      </div>
+      <h3>Medicines</h3>
+      <table><thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead>
+        <tbody>${meds.map(m => `<tr><td>${m.name}</td><td>${m.dosage}</td><td>${m.frequency}</td><td>${m.duration}</td></tr>`).join("")}</tbody></table>
+      ${notes ? `<div class="card"><b>Notes:</b> ${notes}</div>` : ""}
+    `, `Prescription ${edit ?? ""}`);
+  };
+
+  const shareRx = () => {
+    if (!patient) return;
+    const msg = `Hi ${patient.primary}, here is your prescription from ${user?.clinic}.\nDiagnosis: ${diagnosis}\nMedicines:\n${meds.map(m => `• ${m.name} — ${m.dosage} ${m.frequency} × ${m.duration}`).join("\n")}${followup ? `\nFollow-up: ${followup}` : ""}`;
+    sendWhatsApp(patient.tertiary ?? "", msg);
   };
 
   return (
     <>
-      <PageHeader title="New prescription" description="Compose and sign a prescription." />
+      <PageHeader
+        title={edit ? `Edit ${edit}` : isReceptionist ? "Lab report" : "New prescription"}
+        description={isReceptionist ? "You can add or upload lab reports to a prescription." : "Compose, sign and share a prescription."}
+      />
       <div className="grid gap-6 lg:grid-cols-5">
         <form onSubmit={onSubmit} className="lg:col-span-3 space-y-6">
-          <section className="rounded-2xl border bg-card p-6 shadow-soft space-y-4">
-            <div className="space-y-1.5">
-              <Label>Patient <span className="text-destructive">*</span></Label>
-              <EntityPicker options={patientOptions} value={patient} onChange={setPatient}
-                placeholder="Search by name, patient ID or phone…" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Doctor <span className="text-destructive">*</span></Label>
-              <EntityPicker options={doctorOptions} value={doctor} onChange={setDoctor}
-                placeholder="Search by name, doctor ID or phone…" />
-            </div>
-            <div className="space-y-1.5"><Label>Diagnosis <span className="text-destructive">*</span></Label><Input className="h-11 rounded-xl" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} /></div>
-            <div className="space-y-1.5"><Label>Treatment notes</Label><Textarea rows={3} className="rounded-xl" value={notes} onChange={e => setNotes(e.target.value)} /></div>
-            <div className="space-y-1.5"><Label>Follow-up date</Label><Input type="date" className="h-11 rounded-xl" value={followup} onChange={e => setFollowup(e.target.value)} /></div>
-          </section>
+          <fieldset disabled={isReceptionist} className="space-y-6 disabled:opacity-70">
+            <section className="rounded-2xl border bg-card p-6 shadow-soft space-y-4">
+              <div className="space-y-1.5">
+                <Label>Patient <span className="text-destructive">*</span></Label>
+                <EntityPicker options={patientOptions} value={patient} onChange={setPatient}
+                  placeholder="Search by name, patient ID or phone…" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Doctor <span className="text-destructive">*</span></Label>
+                <EntityPicker options={doctorOptions} value={doctor} onChange={setDoctor}
+                  placeholder="Search by name, doctor ID or phone…" />
+              </div>
+              <div className="space-y-1.5"><Label>Diagnosis <span className="text-destructive">*</span></Label>
+                <Input className="h-11 rounded-xl" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
+              </div>
+              <div className="space-y-1.5"><Label>Treatment notes</Label>
+                <Textarea rows={3} className="rounded-xl" value={notes} onChange={e => setNotes(e.target.value)} />
+              </div>
+              <div className="space-y-1.5"><Label>Follow-up date</Label>
+                <Input type="date" className="h-11 rounded-xl" value={followup} onChange={e => setFollowup(e.target.value)} />
+              </div>
+            </section>
 
+            <section className="rounded-2xl border bg-card p-6 shadow-soft">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="font-display text-base font-semibold">Medicines</h2>
+                <Button type="button" size="sm" variant="outline" onClick={() => setMeds([...meds, { name: "", dosage: "", frequency: "", duration: "" }])}>
+                  <Plus className="mr-1 h-3.5 w-3.5" /> Add medicine
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {meds.map((m, i) => (
+                  <div key={i} className="grid grid-cols-1 gap-2 rounded-xl border bg-muted/30 p-3 md:grid-cols-[2fr_1fr_1.2fr_1fr_auto]">
+                    <Input placeholder="Medicine" className="h-10 rounded-lg" value={m.name} onChange={e => update(i, "name", e.target.value)} />
+                    <Input placeholder="Dosage" className="h-10 rounded-lg" value={m.dosage} onChange={e => update(i, "dosage", e.target.value)} />
+                    <Input placeholder="Frequency" className="h-10 rounded-lg" value={m.frequency} onChange={e => update(i, "frequency", e.target.value)} />
+                    <Input placeholder="Duration" className="h-10 rounded-lg" value={m.duration} onChange={e => update(i, "duration", e.target.value)} />
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setMeds(meds.filter((_, idx) => idx !== i))}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </fieldset>
+
+          {/* Lab reports — accessible by everyone */}
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-display text-base font-semibold">Medicines</h2>
-              <Button type="button" size="sm" variant="outline" onClick={() => setMeds([...meds, { name: "", dosage: "", frequency: "", duration: "" }])}>
-                <Plus className="mr-1 h-3.5 w-3.5" /> Add medicine
-              </Button>
+              <h2 className="font-display text-base font-semibold flex items-center gap-2">
+                <FlaskConical className="h-4 w-4 text-info" />Lab reports
+              </h2>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input type="file" accept="application/pdf,image/*" className="hidden"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadLab(f); e.currentTarget.value = ""; }} />
+                <span className="inline-flex items-center rounded-md border h-8 px-3 text-xs font-medium hover:bg-muted">
+                  <Upload className="mr-1 h-3.5 w-3.5" /> Upload file
+                </span>
+              </label>
             </div>
-            <div className="space-y-3">
-              {meds.map((m, i) => (
-                <div key={i} className="grid grid-cols-1 gap-2 rounded-xl border bg-muted/30 p-3 md:grid-cols-[2fr_1fr_1.2fr_1fr_auto]">
-                  <Input placeholder="Medicine" className="h-10 rounded-lg" value={m.name} onChange={e => update(i, "name", e.target.value)} />
-                  <Input placeholder="Dosage" className="h-10 rounded-lg" value={m.dosage} onChange={e => update(i, "dosage", e.target.value)} />
-                  <Input placeholder="Frequency" className="h-10 rounded-lg" value={m.frequency} onChange={e => update(i, "frequency", e.target.value)} />
-                  <Input placeholder="Duration" className="h-10 rounded-lg" value={m.duration} onChange={e => update(i, "duration", e.target.value)} />
-                  <Button type="button" variant="ghost" size="icon" onClick={() => setMeds(meds.filter((_, idx) => idx !== i))}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+
+            {labs.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {labs.map(l => (
+                  <div key={l.id} className="flex items-center justify-between rounded-xl border bg-muted/30 px-4 py-3">
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold">{l.test}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {l.fileName ? `📎 ${l.fileName}` : `${l.result} · ref ${l.reference}`} · by {l.uploadedBy}
+                      </div>
+                    </div>
+                    <Button type="button" size="sm" variant="ghost"
+                      onClick={() => patient && sendWhatsApp(patient.tertiary ?? "", `Lab report — ${l.test}: ${l.result} (ref ${l.reference})`)}>
+                      <Send className="mr-1 h-3.5 w-3.5" />WhatsApp
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="rounded-xl border bg-muted/20 p-3 space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Create structured report</div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Input placeholder="Test name" className="h-10 rounded-lg" value={newLab.test} onChange={e => setNewLab({ ...newLab, test: e.target.value })} />
+                <Input placeholder="Result" className="h-10 rounded-lg" value={newLab.result} onChange={e => setNewLab({ ...newLab, result: e.target.value })} />
+                <Input placeholder="Reference range" className="h-10 rounded-lg" value={newLab.reference} onChange={e => setNewLab({ ...newLab, reference: e.target.value })} />
+                <Input placeholder="Notes" className="h-10 rounded-lg" value={newLab.notes} onChange={e => setNewLab({ ...newLab, notes: e.target.value })} />
+              </div>
+              <Button type="button" size="sm" onClick={addLab}><Plus className="mr-1 h-3.5 w-3.5" />Add lab report</Button>
             </div>
           </section>
 
           <div className="flex gap-2">
             <Button type="button" variant="outline" className="flex-1" onClick={() => navigate({ to: "/app/prescriptions" })}>Cancel</Button>
-            <Button type="submit" className="flex-1">Save & sign</Button>
+            {!isReceptionist && <Button type="submit" className="flex-1">{edit ? "Save changes" : "Save & sign"}</Button>}
+            {isReceptionist && <Button type="button" className="flex-1" onClick={() => { toast.success("Lab reports saved"); navigate({ to: "/app/prescriptions" }); }}>Save lab reports</Button>}
           </div>
         </form>
 
@@ -95,7 +225,7 @@ function NewPrescription() {
               </div>
               <div>
                 <div className="font-display text-base font-bold">{user?.clinic}</div>
-                <div className="text-xs text-muted-foreground">Kungsgatan 32, Stockholm · +46 8 555 0123</div>
+                <div className="text-xs text-muted-foreground">Prescription preview</div>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
@@ -119,13 +249,14 @@ function NewPrescription() {
                 ))}
               </ol>
             </div>
-            {notes && <div className="mt-4"><div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Notes</div><div className="mt-1 text-sm">{notes}</div></div>}
             {followup && <div className="mt-3 text-sm"><span className="text-muted-foreground">Follow-up:</span> <span className="font-semibold">{followup}</span></div>}
-            <div className="mt-8 border-t pt-4">
-              <div className="ml-auto w-48 text-right">
-                <div className="border-b pb-6 font-display italic text-muted-foreground/70">Dr. signature</div>
-                <div className="mt-2 text-xs"><div className="font-semibold">{user?.name}</div><div className="text-muted-foreground">Reg. SE-MED-104821</div></div>
-              </div>
+            <div className="mt-6 flex gap-2">
+              <Button type="button" variant="outline" size="sm" className="flex-1" onClick={printRx}>
+                <Printer className="mr-1 h-3.5 w-3.5" />Download
+              </Button>
+              <Button type="button" size="sm" className="flex-1" onClick={shareRx}>
+                <Send className="mr-1 h-3.5 w-3.5" />WhatsApp
+              </Button>
             </div>
           </div>
         </aside>
