@@ -1,17 +1,26 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useMatches } from "@tanstack/react-router";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { doctors } from "@/lib/sample-data";
+import { Plus } from "lucide-react";
 
-export const Route = createFileRoute("/app/doctors")({ component: DoctorsPage });
+export const Route = createFileRoute("/app/doctors")({ component: DoctorsRoute });
+
+function DoctorsRoute() {
+  const matches = useMatches();
+  const hasChild = matches.some(m => m.routeId === "/app/doctors/new");
+  if (hasChild) return <Outlet />;
+  return <DoctorsPage />;
+}
 
 function DoctorsPage() {
   return (
     <>
       <PageHeader title="Doctors" description="Practitioners at your clinic."
-        actions={<Button>Add doctor</Button>} />
+        actions={<Button asChild><Link to="/app/doctors/new"><Plus className="mr-1.5 h-4 w-4" />Add doctor</Link></Button>} />
+
       <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">
         <Table>
           <TableHeader>
