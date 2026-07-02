@@ -4,10 +4,7 @@ import { Activity, ArrowRight, Building2, ShieldCheck, Stethoscope, UserCog } fr
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { toast } from "sonner";
 import { useAuth, type Role, ROLE_LABELS } from "@/lib/auth";
-
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -106,13 +103,9 @@ function Login() {
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <ForgotPasswordDialog />
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" placeholder="••••••••" className="h-11 rounded-xl" defaultValue="demo-password" />
             </div>
-
 
             <div className="space-y-2">
               <Label>Sign in as (demo)</Label>
@@ -154,77 +147,3 @@ function Login() {
     </div>
   );
 }
-
-function ForgotPasswordDialog() {
-  const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"request" | "reset">("request");
-  const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
-  const [pw2, setPw2] = useState("");
-
-  const reset = () => {
-    setStep("request"); setEmail(""); setPw(""); setPw2("");
-  };
-
-  const sendCode = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) { toast.error("Enter your email"); return; }
-    toast.success("Verification link sent — continue to set a new password");
-    setStep("reset");
-  };
-
-  const savePw = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pw.length < 8) { toast.error("Password must be at least 8 characters"); return; }
-    if (pw !== pw2) { toast.error("Passwords do not match"); return; }
-    toast.success("Password updated — you can sign in now");
-    setOpen(false); reset();
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-      <button type="button" onClick={() => setOpen(true)}
-        className="text-xs font-medium text-primary hover:underline">
-        Forgot password?
-      </button>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{step === "request" ? "Reset your password" : "Set a new password"}</DialogTitle>
-          <DialogDescription>
-            {step === "request"
-              ? "Enter your work email and we'll send a secure reset link."
-              : "Choose a strong password with at least 8 characters."}
-          </DialogDescription>
-        </DialogHeader>
-        {step === "request" ? (
-          <form onSubmit={sendCode} className="space-y-3">
-            <div className="space-y-1.5">
-              <Label>Work email</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@clinic.com" className="h-11 rounded-xl" autoFocus />
-            </div>
-            <DialogFooter><Button type="submit" className="w-full">Send reset link</Button></DialogFooter>
-          </form>
-        ) : (
-          <form onSubmit={savePw} className="space-y-3">
-            <div className="space-y-1.5">
-              <Label>New password</Label>
-              <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)}
-                placeholder="At least 8 characters" className="h-11 rounded-xl" autoFocus />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Confirm new password</Label>
-              <Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)}
-                placeholder="Re-enter password" className="h-11 rounded-xl" />
-            </div>
-            <DialogFooter className="gap-2 sm:gap-2">
-              <Button type="button" variant="outline" onClick={() => setStep("request")}>Back</Button>
-              <Button type="submit">Update password</Button>
-            </DialogFooter>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-

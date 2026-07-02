@@ -12,25 +12,11 @@ export const Route = createFileRoute("/app/prescriptions/")({ component: Prescri
 function PrescriptionsPage() {
   const { user } = useAuth();
   const canCreate = user?.role === "doctor" || user?.role === "clinic_admin";
-  const canAddLab = user?.role === "receptionist" || user?.role === "clinic_admin" || user?.role === "doctor";
   const canEdit = user?.role === "doctor";
   return (
     <>
       <PageHeader title="Prescriptions" description="Issued prescriptions and lab reports."
-        actions={
-          <div className="flex gap-2">
-            {canAddLab && !canCreate && (
-              <Button asChild variant="outline"><Link to="/app/prescriptions/new"><Plus className="mr-1.5 h-4 w-4" />Add lab report</Link></Button>
-            )}
-            {canAddLab && canCreate && (
-              <Button asChild variant="outline"><Link to="/app/prescriptions/new"><Plus className="mr-1.5 h-4 w-4" />Add lab report</Link></Button>
-            )}
-            {canCreate && (
-              <Button asChild><Link to="/app/prescriptions/new"><Plus className="mr-1.5 h-4 w-4" />New prescription</Link></Button>
-            )}
-          </div>
-        } />
-
+        actions={canCreate ? <Button asChild><Link to="/app/prescriptions/new"><Plus className="mr-1.5 h-4 w-4" />New prescription</Link></Button> : null} />
       <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">
         <Table>
           <TableHeader><TableRow>
