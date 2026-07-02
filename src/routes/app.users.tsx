@@ -36,8 +36,8 @@ function UsersPage() {
     if (!form.name.trim() || !form.email.trim()) { toast.error("Name and email are required"); return; }
     const prefix = inviteRole === "Super Admin" ? "SA" : "AD";
     const nextId = `${prefix}-${String(rows.filter(r => r.id.startsWith(prefix)).length + 1).padStart(2, "0")}`;
-    setRows([{ id: nextId, name: form.name, email: form.email, role: inviteRole!, status: "Invited" }, ...rows]);
-    toast.success(`Invitation sent to ${form.email}`);
+    setRows([{ id: nextId, name: form.name, email: form.email, role: inviteRole!, status: "Active" }, ...rows]);
+    toast.success(`${inviteRole} ${form.name} added`);
     setInviteRole(null);
     setForm({ name: "", email: "", phone: "" });
   };
@@ -50,21 +50,22 @@ function UsersPage() {
             {isSuper && (
               <Dialog open={inviteRole === "Super Admin"} onOpenChange={(o) => setInviteRole(o ? "Super Admin" : null)}>
                 <DialogTrigger asChild>
-                  <Button variant="outline"><UserPlus className="mr-1.5 h-4 w-4" />Invite Super Admin</Button>
+                  <Button variant="outline"><UserPlus className="mr-1.5 h-4 w-4" />Add Super Admin</Button>
                 </DialogTrigger>
-                <InviteDialog title="Invite Super Admin" form={form} setForm={setForm} onSubmit={submit} />
+                <AddUserDialog title="Add Super Admin" form={form} setForm={setForm} onSubmit={submit} />
               </Dialog>
             )}
             {(isClinicAdmin || isSuper) && (
               <Dialog open={inviteRole === "Clinic Admin"} onOpenChange={(o) => setInviteRole(o ? "Clinic Admin" : null)}>
                 <DialogTrigger asChild>
-                  <Button><UserPlus className="mr-1.5 h-4 w-4" />Invite Clinic Admin</Button>
+                  <Button><UserPlus className="mr-1.5 h-4 w-4" />Add Clinic Admin</Button>
                 </DialogTrigger>
-                <InviteDialog title="Invite Clinic Admin" form={form} setForm={setForm} onSubmit={submit} />
+                <AddUserDialog title="Add Clinic Admin" form={form} setForm={setForm} onSubmit={submit} />
               </Dialog>
             )}
           </div>
         } />
+
       <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">
         <Table>
           <TableHeader>
@@ -101,7 +102,7 @@ function UsersPage() {
   );
 }
 
-function InviteDialog({ title, form, setForm, onSubmit }: {
+function AddUserDialog({ title, form, setForm, onSubmit }: {
   title: string;
   form: { name: string; email: string; phone: string };
   setForm: (v: { name: string; email: string; phone: string }) => void;
@@ -112,18 +113,22 @@ function InviteDialog({ title, form, setForm, onSubmit }: {
       <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
       <div className="space-y-3">
         <div className="space-y-1.5"><Label>Full name</Label>
-          <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-11 rounded-xl" />
+          <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-11 rounded-xl" placeholder="Full name" />
         </div>
         <div className="space-y-1.5"><Label>Email</Label>
-          <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-11 rounded-xl" />
+          <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-11 rounded-xl" placeholder="user@clinic.com" />
         </div>
-        <div className="space-y-1.5"><Label>Phone (optional)</Label>
-          <Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="h-11 rounded-xl" />
+        <div className="space-y-1.5"><Label>Phone</Label>
+          <Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="h-11 rounded-xl" placeholder="+91 …" />
+        </div>
+        <div className="space-y-1.5"><Label>Temporary password</Label>
+          <Input type="password" defaultValue="ClinicFlow@123" className="h-11 rounded-xl" />
         </div>
       </div>
       <DialogFooter>
-        <Button onClick={onSubmit} className="w-full">Send invitation</Button>
+        <Button onClick={onSubmit} className="w-full">Add user</Button>
       </DialogFooter>
     </DialogContent>
   );
 }
+
