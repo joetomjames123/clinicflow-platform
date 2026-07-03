@@ -64,7 +64,7 @@ function UsersPage() {
                 <DialogTrigger asChild>
                   <Button><UserPlus className="mr-1.5 h-4 w-4" />Add Clinic Admin</Button>
                 </DialogTrigger>
-                <AddUserDialog title="Add Clinic Admin" form={form} setForm={setForm} onSubmit={submit} />
+                <AddUserDialog title="Add Clinic Admin" form={form} setForm={setForm} onSubmit={submit} onGenerate={genPwd} />
               </Dialog>
             )}
           </div>
