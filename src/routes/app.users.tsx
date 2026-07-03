@@ -30,16 +30,20 @@ function UsersPage() {
 
   const [rows, setRows] = useState<Row[]>(initial);
   const [inviteRole, setInviteRole] = useState<"Super Admin" | "Clinic Admin" | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", tempPwd: "" });
+  const genPwd = () => setForm(f => ({ ...f, tempPwd: "CF" + Math.random().toString(36).slice(2, 8) + "!" + Math.floor(Math.random() * 90 + 10) }));
 
   const submit = () => {
-    if (!form.name.trim() || !form.email.trim()) { toast.error("Name and email are required"); return; }
+    if (!form.name.trim() || !form.email.trim() || form.tempPwd.length < 8) {
+      toast.error("Name, email and a temp password (min 8 chars) are required");
+      return;
+    }
     const prefix = inviteRole === "Super Admin" ? "SA" : "AD";
     const nextId = `${prefix}-${String(rows.filter(r => r.id.startsWith(prefix)).length + 1).padStart(2, "0")}`;
     setRows([{ id: nextId, name: form.name, email: form.email, role: inviteRole!, status: "Active" }, ...rows]);
-    toast.success(`${inviteRole} ${form.name} added`);
+    toast.success(`${inviteRole} added. Login credentials emailed to ${form.email}`);
     setInviteRole(null);
-    setForm({ name: "", email: "", phone: "" });
+    setForm({ name: "", email: "", phone: "", tempPwd: "" });
   };
 
   return (
