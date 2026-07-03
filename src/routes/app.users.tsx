@@ -30,16 +30,20 @@ function UsersPage() {
 
   const [rows, setRows] = useState<Row[]>(initial);
   const [inviteRole, setInviteRole] = useState<"Super Admin" | "Clinic Admin" | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", tempPwd: "" });
+  const genPwd = () => setForm(f => ({ ...f, tempPwd: "CF" + Math.random().toString(36).slice(2, 8) + "!" + Math.floor(Math.random() * 90 + 10) }));
 
   const submit = () => {
-    if (!form.name.trim() || !form.email.trim()) { toast.error("Name and email are required"); return; }
+    if (!form.name.trim() || !form.email.trim() || form.tempPwd.length < 8) {
+      toast.error("Name, email and a temp password (min 8 chars) are required");
+      return;
+    }
     const prefix = inviteRole === "Super Admin" ? "SA" : "AD";
     const nextId = `${prefix}-${String(rows.filter(r => r.id.startsWith(prefix)).length + 1).padStart(2, "0")}`;
     setRows([{ id: nextId, name: form.name, email: form.email, role: inviteRole!, status: "Active" }, ...rows]);
-    toast.success(`${inviteRole} ${form.name} added`);
+    toast.success(`${inviteRole} added. Login credentials emailed to ${form.email}`);
     setInviteRole(null);
-    setForm({ name: "", email: "", phone: "" });
+    setForm({ name: "", email: "", phone: "", tempPwd: "" });
   };
 
   return (
@@ -52,7 +56,7 @@ function UsersPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline"><UserPlus className="mr-1.5 h-4 w-4" />Add Super Admin</Button>
                 </DialogTrigger>
-                <AddUserDialog title="Add Super Admin" form={form} setForm={setForm} onSubmit={submit} />
+                <AddUserDialog title="Add Super Admin" form={form} setForm={setForm} onSubmit={submit} onGenerate={genPwd} />
               </Dialog>
             )}
             {(isClinicAdmin || isSuper) && (
@@ -60,7 +64,7 @@ function UsersPage() {
                 <DialogTrigger asChild>
                   <Button><UserPlus className="mr-1.5 h-4 w-4" />Add Clinic Admin</Button>
                 </DialogTrigger>
-                <AddUserDialog title="Add Clinic Admin" form={form} setForm={setForm} onSubmit={submit} />
+                <AddUserDialog title="Add Clinic Admin" form={form} setForm={setForm} onSubmit={submit} onGenerate={genPwd} />
               </Dialog>
             )}
           </div>
@@ -102,31 +106,38 @@ function UsersPage() {
   );
 }
 
-function AddUserDialog({ title, form, setForm, onSubmit }: {
+type FormState = { name: string; email: string; phone: string; tempPwd: string };
+
+function AddUserDialog({ title, form, setForm, onSubmit, onGenerate }: {
   title: string;
-  form: { name: string; email: string; phone: string };
-  setForm: (v: { name: string; email: string; phone: string }) => void;
+  form: FormState;
+  setForm: React.Dispatch<React.SetStateAction<FormState>>;
   onSubmit: () => void;
+  onGenerate: () => void;
 }) {
   return (
     <DialogContent className="max-w-md">
       <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+      <p className="text-xs text-muted-foreground">Email and temporary password are required — they will be emailed so the user can sign in.</p>
       <div className="space-y-3">
         <div className="space-y-1.5"><Label>Full name</Label>
           <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-11 rounded-xl" placeholder="Full name" />
         </div>
-        <div className="space-y-1.5"><Label>Email</Label>
+        <div className="space-y-1.5"><Label>Email (login ID)</Label>
           <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-11 rounded-xl" placeholder="user@clinic.com" />
         </div>
         <div className="space-y-1.5"><Label>Phone</Label>
           <Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="h-11 rounded-xl" placeholder="+91 …" />
         </div>
         <div className="space-y-1.5"><Label>Temporary password</Label>
-          <Input type="password" defaultValue="ClinicFlow@123" className="h-11 rounded-xl" />
+          <div className="flex gap-2">
+            <Input value={form.tempPwd} onChange={e => setForm({ ...form, tempPwd: e.target.value })} className="h-11 rounded-xl font-mono" placeholder="Min 8 characters" />
+            <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={onGenerate}>Generate</Button>
+          </div>
         </div>
       </div>
       <DialogFooter>
-        <Button onClick={onSubmit} className="w-full">Add user</Button>
+        <Button onClick={onSubmit} className="w-full">Add & send credentials</Button>
       </DialogFooter>
     </DialogContent>
   );

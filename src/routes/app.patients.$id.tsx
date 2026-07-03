@@ -25,6 +25,7 @@ function PatientProfile() {
   const myLabs = labReports.filter(l => l.patientId === patient.id);
 
   const canEditRx = user?.role === "doctor";
+  const canAddLab = user?.role === "doctor" || user?.role === "clinic_admin" || user?.role === "receptionist";
 
   const exportAll = () => {
     downloadCSV(`${patient.id}-profile.csv`, [{ ...patient }]);
@@ -138,6 +139,15 @@ function PatientProfile() {
             </TabsContent>
 
             <TabsContent value="labs" className="mt-4 space-y-3">
+              {canAddLab && (
+                <div className="flex justify-end">
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/app/prescriptions/new" search={{ mode: "lab", patient: patient.id }}>
+                      <FlaskConical className="mr-1.5 h-3.5 w-3.5" />Add lab report
+                    </Link>
+                  </Button>
+                </div>
+              )}
               {myLabs.length === 0 && <EmptyCard label="No lab reports yet" />}
               {myLabs.map(l => (
                 <div key={l.id} className="rounded-2xl border bg-card p-5 shadow-soft">
