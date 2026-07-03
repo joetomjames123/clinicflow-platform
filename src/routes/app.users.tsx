@@ -56,7 +56,7 @@ function UsersPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline"><UserPlus className="mr-1.5 h-4 w-4" />Add Super Admin</Button>
                 </DialogTrigger>
-                <AddUserDialog title="Add Super Admin" form={form} setForm={setForm} onSubmit={submit} />
+                <AddUserDialog title="Add Super Admin" form={form} setForm={setForm} onSubmit={submit} onGenerate={genPwd} />
               </Dialog>
             )}
             {(isClinicAdmin || isSuper) && (
