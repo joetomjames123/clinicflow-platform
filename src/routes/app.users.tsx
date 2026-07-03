@@ -106,31 +106,38 @@ function UsersPage() {
   );
 }
 
-function AddUserDialog({ title, form, setForm, onSubmit }: {
+type FormState = { name: string; email: string; phone: string; tempPwd: string };
+
+function AddUserDialog({ title, form, setForm, onSubmit, onGenerate }: {
   title: string;
-  form: { name: string; email: string; phone: string };
-  setForm: (v: { name: string; email: string; phone: string }) => void;
+  form: FormState;
+  setForm: React.Dispatch<React.SetStateAction<FormState>>;
   onSubmit: () => void;
+  onGenerate: () => void;
 }) {
   return (
     <DialogContent className="max-w-md">
       <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+      <p className="text-xs text-muted-foreground">Email and temporary password are required — they will be emailed so the user can sign in.</p>
       <div className="space-y-3">
         <div className="space-y-1.5"><Label>Full name</Label>
           <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-11 rounded-xl" placeholder="Full name" />
         </div>
-        <div className="space-y-1.5"><Label>Email</Label>
+        <div className="space-y-1.5"><Label>Email (login ID)</Label>
           <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-11 rounded-xl" placeholder="user@clinic.com" />
         </div>
         <div className="space-y-1.5"><Label>Phone</Label>
           <Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="h-11 rounded-xl" placeholder="+91 …" />
         </div>
         <div className="space-y-1.5"><Label>Temporary password</Label>
-          <Input type="password" defaultValue="ClinicFlow@123" className="h-11 rounded-xl" />
+          <div className="flex gap-2">
+            <Input value={form.tempPwd} onChange={e => setForm({ ...form, tempPwd: e.target.value })} className="h-11 rounded-xl font-mono" placeholder="Min 8 characters" />
+            <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={onGenerate}>Generate</Button>
+          </div>
         </div>
       </div>
       <DialogFooter>
-        <Button onClick={onSubmit} className="w-full">Add user</Button>
+        <Button onClick={onSubmit} className="w-full">Add & send credentials</Button>
       </DialogFooter>
     </DialogContent>
   );
