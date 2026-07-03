@@ -20,6 +20,18 @@ function Field({ label, span = 6, children }: { label: string; span?: number; ch
 
 function NewDoctor() {
   const navigate = useNavigate();
+  const [email, setEmail] = React.useState("");
+  const [tempPwd, setTempPwd] = React.useState("");
+  const genPwd = () => setTempPwd("CF" + Math.random().toString(36).slice(2, 8) + "!" + Math.floor(Math.random() * 90 + 10));
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !tempPwd.trim() || tempPwd.length < 8) {
+      toast.error("Email and a temporary password (min 8 chars) are required to create login credentials");
+      return;
+    }
+    toast.success(`Doctor added. Login credentials emailed to ${email}`);
+    navigate({ to: "/app/doctors" });
+  };
   return (
     <>
       <PageHeader title="Add doctor" description="Register a new practitioner in your clinic." />
