@@ -25,6 +25,7 @@ function PatientProfile() {
   const myLabs = labReports.filter(l => l.patientId === patient.id);
 
   const canEditRx = user?.role === "doctor";
+  const canAddLab = user?.role === "doctor" || user?.role === "clinic_admin" || user?.role === "receptionist";
 
   const exportAll = () => {
     downloadCSV(`${patient.id}-profile.csv`, [{ ...patient }]);
