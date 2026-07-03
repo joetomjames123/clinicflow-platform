@@ -60,10 +60,17 @@ function NewDoctor() {
           </section>
 
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="mb-4 font-display text-base font-semibold">Contact & login</h2>
+            <h2 className="mb-1 font-display text-base font-semibold">Contact & login credentials</h2>
+            <p className="mb-4 text-xs text-muted-foreground">Email and temporary password are required — they will be sent to the doctor so they can sign in.</p>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
-              <Field label="Email" span={3}><Input required type="email" className="h-11 rounded-xl" placeholder="amelia@clinic.com" /></Field>
+              <Field label="Email (login ID)" span={3}><Input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="h-11 rounded-xl" placeholder="amelia@clinic.com" /></Field>
               <Field label="Phone" span={3}><Input required className="h-11 rounded-xl" placeholder="+91 98765 43210" /></Field>
+              <Field label="Temporary password" span={4}>
+                <Input required minLength={8} value={tempPwd} onChange={e => setTempPwd(e.target.value)} className="h-11 rounded-xl font-mono" placeholder="Min 8 characters" />
+              </Field>
+              <div className="md:col-span-2 flex items-end">
+                <Button type="button" variant="outline" className="w-full h-11 rounded-xl" onClick={genPwd}>Generate</Button>
+              </div>
               <Field label="Consultation fee (₹)" span={3}><Input type="number" className="h-11 rounded-xl" placeholder="500" /></Field>
               <Field label="Working hours" span={3}><Input className="h-11 rounded-xl" placeholder="9:00 AM – 5:00 PM" /></Field>
               <Field label="Notes" span={6}><Textarea rows={2} className="rounded-xl" placeholder="Available on weekends, etc." /></Field>
