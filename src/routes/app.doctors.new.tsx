@@ -36,10 +36,7 @@ function NewDoctor() {
   return (
     <>
       <PageHeader title="Add doctor" description="Register a new practitioner in your clinic." />
-      <form
-        onSubmit={(e) => { e.preventDefault(); toast.success("Doctor added"); navigate({ to: "/app/doctors" }); }}
-        className="grid gap-6 lg:grid-cols-3"
-      >
+      <form onSubmit={submit} className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <h2 className="mb-4 font-display text-base font-semibold">Personal information</h2>
