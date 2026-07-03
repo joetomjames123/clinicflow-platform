@@ -15,7 +15,11 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/prescriptions/new")({
   component: NewPrescription,
-  validateSearch: (s: Record<string, unknown>) => ({ edit: typeof s.edit === "string" ? s.edit : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    edit: typeof s.edit === "string" ? s.edit : undefined,
+    mode: s.mode === "lab" ? "lab" as const : undefined,
+    patient: typeof s.patient === "string" ? s.patient : undefined,
+  }),
 });
 
 type Med = { name: string; dosage: string; frequency: string; duration: string };
