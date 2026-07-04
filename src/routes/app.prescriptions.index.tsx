@@ -43,7 +43,7 @@ function PrescriptionsPage() {
             <TableHead className="text-right">Actions</TableHead>
           </TableRow></TableHeader>
           <TableBody>
-            {prescriptions.map(r => (
+            {rows.map(r => (
               <TableRow key={r.id}>
                 <TableCell><div className="flex items-center gap-2 font-mono text-xs"><FileText className="h-3.5 w-3.5 text-info" />{r.id}</div></TableCell>
                 <TableCell className="font-semibold">{r.patient}</TableCell>
