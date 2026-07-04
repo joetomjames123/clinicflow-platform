@@ -31,6 +31,8 @@ function NewPrescription() {
   const isReceptionist = user?.role === "receptionist";
 
   const seed = useMemo(() => edit ? SEED.find(p => p.id === edit) : undefined, [edit]);
+  const isDoctor = user?.role === "doctor";
+  const isOwnRx = !seed || !isDoctor || seed.doctor === user?.name;
 
   const [patient, setPatient] = useState<PatientOption | null>(
     seed ? patientOptions.find(p => p.id === seed.patientId) ?? patientOptions[0] : patientOptions[0]
@@ -82,6 +84,7 @@ function NewPrescription() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isReceptionist) return; // guard
+    if (!isOwnRx) { toast.error("You can only edit prescriptions you issued"); return; }
     if (!patient) { toast.error("Please select a patient"); return; }
     if (!doctor) { toast.error("Please select a doctor"); return; }
     if (!diagnosis.trim()) { toast.error("Diagnosis is required"); return; }
