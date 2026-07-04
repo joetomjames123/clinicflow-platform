@@ -1,10 +1,10 @@
 export const clinics = [
-  { id: "CL-001", name: "Northwood Health", city: "Stockholm, SE", doctors: 12, receptionists: 5, patients: 1840, plan: "Pro", status: "Active", expires: "2026-09-14" },
-  { id: "CL-002", name: "Riverside Medical", city: "Toronto, CA", doctors: 8, receptionists: 3, patients: 1210, plan: "Pro", status: "Active", expires: "2026-08-02" },
-  { id: "CL-003", name: "Aurora Family Clinic", city: "Oslo, NO", doctors: 5, receptionists: 2, patients: 620, plan: "Starter", status: "Active", expires: "2026-07-21" },
-  { id: "CL-004", name: "Greenfield Practice", city: "Manchester, UK", doctors: 6, receptionists: 2, patients: 880, plan: "Pro", status: "Expiring", expires: "2026-06-27" },
-  { id: "CL-005", name: "Bayview Wellness", city: "San Diego, US", doctors: 9, receptionists: 4, patients: 1450, plan: "Enterprise", status: "Active", expires: "2027-01-10" },
-  { id: "CL-006", name: "Heritage Family Care", city: "Dublin, IE", doctors: 4, receptionists: 2, patients: 510, plan: "Starter", status: "Expired", expires: "2026-05-30" },
+  { id: "CL-001", name: "Northwood Health", city: "Stockholm, SE", doctors: 12, receptionists: 5, patients: 1840, plan: "ClinicFlow", status: "Active", expires: "2026-09-14" },
+  { id: "CL-002", name: "Riverside Medical", city: "Toronto, CA", doctors: 8, receptionists: 3, patients: 1210, plan: "ClinicFlow", status: "Active", expires: "2026-08-02" },
+  { id: "CL-003", name: "Aurora Family Clinic", city: "Oslo, NO", doctors: 5, receptionists: 2, patients: 620, plan: "ClinicFlow", status: "Active", expires: "2026-07-21" },
+  { id: "CL-004", name: "Greenfield Practice", city: "Manchester, UK", doctors: 6, receptionists: 2, patients: 880, plan: "ClinicFlow", status: "Expiring", expires: "2026-06-27" },
+  { id: "CL-005", name: "Bayview Wellness", city: "San Diego, US", doctors: 9, receptionists: 4, patients: 1450, plan: "ClinicFlow", status: "Active", expires: "2027-01-10" },
+  { id: "CL-006", name: "Heritage Family Care", city: "Dublin, IE", doctors: 4, receptionists: 2, patients: 510, plan: "ClinicFlow", status: "Expired", expires: "2026-05-30" },
 ];
 
 export const patients = [

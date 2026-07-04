@@ -1,12 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { subscriptions } from "@/lib/sample-data";
+import { subscriptions as SEED } from "@/lib/sample-data";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/subscriptions")({ component: SubscriptionsPage });
+
+type Sub = (typeof SEED)[number];
 
 function badgeFor(days: number) {
   if (days < 0) return <Badge variant="destructive">Expired {Math.abs(days)}d ago</Badge>;
@@ -17,7 +22,14 @@ function badgeFor(days: number) {
   return <Badge variant="secondary">{days} days left</Badge>;
 }
 
-function SubTable({ rows }: { rows: typeof subscriptions }) {
+function addDaysISO(iso: string, days: number) {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function SubTable({ rows, onExtend }: { rows: Sub[]; onExtend: (clinic: string, days: number) => void }) {
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
   return (
     <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">
       <Table>
@@ -27,6 +39,7 @@ function SubTable({ rows }: { rows: typeof subscriptions }) {
             <TableHead className="text-right">Amount</TableHead>
             <TableHead>Renews</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Extend (days)</TableHead>
             <TableHead></TableHead>
           </TableRow>
         </TableHeader>
@@ -37,6 +50,28 @@ function SubTable({ rows }: { rows: typeof subscriptions }) {
               <TableCell className="text-right tabular-nums">₹{s.price}</TableCell>
               <TableCell className="text-muted-foreground">{s.renews}</TableCell>
               <TableCell>{badgeFor(s.daysLeft)}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    type="number"
+                    placeholder="30"
+                    className="h-8 w-20 rounded-lg"
+                    value={drafts[s.clinic] ?? ""}
+                    onChange={(e) => setDrafts({ ...drafts, [s.clinic]: e.target.value })}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const days = Number(drafts[s.clinic]);
+                      if (!Number.isFinite(days) || days <= 0) return toast.error("Enter number of days");
+                      onExtend(s.clinic, days);
+                      setDrafts({ ...drafts, [s.clinic]: "" });
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </TableCell>
               <TableCell className="text-right">
                 <Button size="sm" variant="outline">Send reminder</Button>
               </TableCell>
@@ -49,26 +84,44 @@ function SubTable({ rows }: { rows: typeof subscriptions }) {
 }
 
 function SubscriptionsPage() {
-  const active = subscriptions.filter(s => s.status === "Active");
-  const expiring = subscriptions.filter(s => s.daysLeft >= 0 && s.daysLeft <= 15);
-  const expired = subscriptions.filter(s => s.status === "Expired");
+  const [subs, setSubs] = useState<Sub[]>(SEED);
+
+  const extend = (clinic: string, days: number) => {
+    setSubs(prev =>
+      prev.map(s => {
+        if (s.clinic !== clinic) return s;
+        const newRenews = addDaysISO(s.renews, days);
+        const newDaysLeft = s.daysLeft + days;
+        const status = newDaysLeft < 0 ? "Expired" : newDaysLeft <= 15 ? "Expiring" : "Active";
+        return { ...s, renews: newRenews, daysLeft: newDaysLeft, status };
+      }),
+    );
+    toast.success(`${clinic} extended by ${days} days`);
+  };
+
+  const active = subs.filter(s => s.status === "Active");
+  const expiring = subs.filter(s => s.daysLeft >= 0 && s.daysLeft <= 15);
+  const expired = subs.filter(s => s.status === "Expired");
 
   return (
     <>
-      <PageHeader title="Subscriptions" description="Active, expiring, expired and renewal history." />
+      <PageHeader
+        title="Subscriptions"
+        description="Single ClinicFlow plan. Enter renewal days manually — e.g. 30 for one month, 60 for two months."
+      />
       <Tabs defaultValue="all">
         <TabsList className="rounded-xl bg-muted/60 p-1">
-          <TabsTrigger value="all" className="rounded-lg">All ({subscriptions.length})</TabsTrigger>
+          <TabsTrigger value="all" className="rounded-lg">All ({subs.length})</TabsTrigger>
           <TabsTrigger value="active" className="rounded-lg">Active ({active.length})</TabsTrigger>
           <TabsTrigger value="expiring" className="rounded-lg">Expiring ({expiring.length})</TabsTrigger>
           <TabsTrigger value="expired" className="rounded-lg">Expired ({expired.length})</TabsTrigger>
           <TabsTrigger value="history" className="rounded-lg">Renewal history</TabsTrigger>
         </TabsList>
-        <TabsContent value="all" className="mt-4"><SubTable rows={subscriptions} /></TabsContent>
-        <TabsContent value="active" className="mt-4"><SubTable rows={active} /></TabsContent>
-        <TabsContent value="expiring" className="mt-4"><SubTable rows={expiring} /></TabsContent>
-        <TabsContent value="expired" className="mt-4"><SubTable rows={expired} /></TabsContent>
-        <TabsContent value="history" className="mt-4"><SubTable rows={subscriptions} /></TabsContent>
+        <TabsContent value="all" className="mt-4"><SubTable rows={subs} onExtend={extend} /></TabsContent>
+        <TabsContent value="active" className="mt-4"><SubTable rows={active} onExtend={extend} /></TabsContent>
+        <TabsContent value="expiring" className="mt-4"><SubTable rows={expiring} onExtend={extend} /></TabsContent>
+        <TabsContent value="expired" className="mt-4"><SubTable rows={expired} onExtend={extend} /></TabsContent>
+        <TabsContent value="history" className="mt-4"><SubTable rows={subs} onExtend={extend} /></TabsContent>
       </Tabs>
     </>
   );

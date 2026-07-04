@@ -33,14 +33,7 @@ function AddClinic() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
               <Field label="Clinic name" span={4}><Input placeholder="Northwood Health" className="h-11 rounded-xl" /></Field>
               <Field label="Plan" span={2}>
-                <Select defaultValue="pro">
-                  <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="starter">Starter — €99/mo</SelectItem>
-                    <SelectItem value="pro">Pro — €249/mo</SelectItem>
-                    <SelectItem value="enterprise">Enterprise — €599/mo</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input value="ClinicFlow — single plan" disabled className="h-11 rounded-xl" />
               </Field>
               <Field label="Email" span={3}><Input type="email" placeholder="admin@clinic.com" className="h-11 rounded-xl" /></Field>
               <Field label="Phone" span={3}><Input placeholder="+46 ..." className="h-11 rounded-xl" /></Field>
