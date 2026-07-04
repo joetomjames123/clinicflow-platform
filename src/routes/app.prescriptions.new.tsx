@@ -84,6 +84,7 @@ function NewPrescription() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isReceptionist) return; // guard
+    if (!isOwnRx) { toast.error("You can only edit prescriptions you issued"); return; }
     if (!patient) { toast.error("Please select a patient"); return; }
     if (!doctor) { toast.error("Please select a doctor"); return; }
     if (!diagnosis.trim()) { toast.error("Diagnosis is required"); return; }
