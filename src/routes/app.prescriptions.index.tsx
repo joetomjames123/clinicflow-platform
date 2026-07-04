@@ -14,6 +14,9 @@ function PrescriptionsPage() {
   const canCreateRx = user?.role === "doctor";
   const canAddLab = user?.role === "receptionist" || user?.role === "clinic_admin" || user?.role === "doctor";
   const canEdit = user?.role === "doctor";
+  const rows = user?.role === "doctor"
+    ? prescriptions.filter(p => p.doctor === user.name)
+    : prescriptions;
   return (
     <>
       <PageHeader title="Prescriptions" description="Issued prescriptions and lab reports."
