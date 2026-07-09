@@ -263,9 +263,15 @@ function NewPrescription() {
           </section>
 
           <div className="flex gap-2">
-            <Button type="button" variant="outline" className="flex-1" onClick={() => navigate({ to: "/app/prescriptions" })}>Cancel</Button>
-            {!isReceptionist && <Button type="submit" className="flex-1">{edit ? "Save changes" : "Save & sign"}</Button>}
-            {isReceptionist && <Button type="button" className="flex-1" onClick={() => { toast.success("Lab reports saved"); navigate({ to: "/app/prescriptions" }); }}>Save lab reports</Button>}
+            <Button type="button" variant="outline" className="flex-1"
+              onClick={() => navigate(patientLocked && patient ? { to: "/app/patients/$id", params: { id: patient.id } } : { to: "/app/prescriptions" })}>
+              Cancel
+            </Button>
+            {isLabMode
+              ? <Button type="submit" className="flex-1">Save lab report</Button>
+              : !isReceptionist
+                ? <Button type="submit" className="flex-1">{edit ? "Save changes" : "Save & sign"}</Button>
+                : <Button type="button" className="flex-1" onClick={() => { toast.success("Lab reports saved"); navigate({ to: "/app/prescriptions" }); }}>Save lab reports</Button>}
           </div>
         </form>
 
