@@ -27,25 +27,31 @@ type Med = { name: string; dosage: string; frequency: string; duration: string }
 function NewPrescription() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { edit } = Route.useSearch();
+  const { edit, mode, patient: patientParam } = Route.useSearch();
   const isReceptionist = user?.role === "receptionist";
+  const isLabMode = mode === "lab";
+  const patientLocked = Boolean(patientParam);
 
   const seed = useMemo(() => edit ? SEED.find(p => p.id === edit) : undefined, [edit]);
   const isDoctor = user?.role === "doctor";
   const isOwnRx = !seed || !isDoctor || seed.doctor === user?.name;
 
   const [patient, setPatient] = useState<PatientOption | null>(
-    seed ? patientOptions.find(p => p.id === seed.patientId) ?? patientOptions[0] : patientOptions[0]
+    patientParam
+      ? patientOptions.find(p => p.id === patientParam) ?? null
+      : seed ? patientOptions.find(p => p.id === seed.patientId) ?? null : null
   );
   const [doctor, setDoctor] = useState<DoctorOption | null>(
-    seed ? doctorOptions.find(d => d.raw.name === seed.doctor) ?? doctorOptions[0] : doctorOptions[0]
+    seed
+      ? doctorOptions.find(d => d.raw.name === seed.doctor) ?? null
+      : isDoctor ? doctorOptions.find(d => d.raw.name === user?.name) ?? null : null
   );
-  const [diagnosis, setDiagnosis] = useState(seed?.diagnosis ?? "Seasonal allergic rhinitis");
-  const [notes, setNotes] = useState(seed?.notes ?? "Rest and hydration. Avoid known triggers.");
+  const [diagnosis, setDiagnosis] = useState(seed?.diagnosis ?? (isLabMode ? "" : "Seasonal allergic rhinitis"));
+  const [notes, setNotes] = useState(seed?.notes ?? (isLabMode ? "" : "Rest and hydration. Avoid known triggers."));
   const [followup, setFollowup] = useState(seed?.followUp ?? "");
   const [meds, setMeds] = useState<Med[]>(
     seed?.medicines.map(m => ({ name: m.name, dosage: m.dosage, frequency: m.frequency, duration: m.duration })) ??
-    [{ name: "Amoxicillin 500 mg", dosage: "1 tab", frequency: "3× per day", duration: "5 days" }]
+    (isLabMode ? [] : [{ name: "Amoxicillin 500 mg", dosage: "1 tab", frequency: "3× per day", duration: "5 days" }])
   );
   const [labs, setLabs] = useState<LabReport[]>(
     edit ? SEED_LABS.filter(l => l.prescriptionId === edit) : []
