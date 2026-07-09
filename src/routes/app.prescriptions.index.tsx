@@ -12,7 +12,6 @@ export const Route = createFileRoute("/app/prescriptions/")({ component: Prescri
 function PrescriptionsPage() {
   const { user } = useAuth();
   const canCreateRx = user?.role === "doctor";
-  const canAddLab = user?.role === "receptionist" || user?.role === "clinic_admin" || user?.role === "doctor";
   const canEdit = user?.role === "doctor";
   const rows = user?.role === "doctor"
     ? prescriptions.filter(p => p.doctor === user.name)
@@ -22,9 +21,6 @@ function PrescriptionsPage() {
       <PageHeader title="Prescriptions" description="Issued prescriptions and lab reports."
         actions={
           <div className="flex gap-2">
-            {canAddLab && (
-              <Button asChild variant="outline"><Link to="/app/prescriptions/new" search={{ mode: "lab" }}><Plus className="mr-1.5 h-4 w-4" />Add lab report</Link></Button>
-            )}
             {canCreateRx && (
               <Button asChild><Link to="/app/prescriptions/new"><Plus className="mr-1.5 h-4 w-4" />New prescription</Link></Button>
             )}
