@@ -89,9 +89,15 @@ function NewPrescription() {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isReceptionist) return; // guard
+    if (isReceptionist && !isLabMode) return; // guard
     if (!isOwnRx) { toast.error("You can only edit prescriptions you issued"); return; }
     if (!patient) { toast.error("Please select a patient"); return; }
+    if (isLabMode) {
+      if (labs.length === 0) { toast.error("Add at least one lab report"); return; }
+      toast.success("Lab report saved");
+      navigate({ to: "/app/patients/$id", params: { id: patient.id } });
+      return;
+    }
     if (!doctor) { toast.error("Please select a doctor"); return; }
     if (!diagnosis.trim()) { toast.error("Diagnosis is required"); return; }
     if (meds.length === 0 || !meds[0].name.trim()) { toast.error("Add at least one medicine"); return; }
