@@ -131,55 +131,89 @@ function NewPrescription() {
   return (
     <>
       <PageHeader
-        title={edit ? `Edit ${edit}` : isReceptionist ? "Lab report" : "New prescription"}
-        description={isReceptionist ? "You can add or upload lab reports to a prescription." : "Compose, sign and share a prescription."}
+        title={edit ? `Edit ${edit}` : isLabMode ? "Add lab report" : isReceptionist ? "Lab report" : "New prescription"}
+        description={
+          isLabMode
+            ? "Attach a lab report to this patient. Doctor is optional."
+            : isReceptionist
+              ? "You can add or upload lab reports to a prescription."
+              : "Compose, sign and share a prescription."
+        }
       />
       <div className="grid gap-6 lg:grid-cols-5">
         <form onSubmit={onSubmit} className="lg:col-span-3 space-y-6">
-          <fieldset disabled={isReceptionist} className="space-y-6 disabled:opacity-70">
+          <fieldset disabled={isReceptionist && !isLabMode} className="space-y-6 disabled:opacity-70">
             <section className="rounded-2xl border bg-card p-6 shadow-soft space-y-4">
               <div className="space-y-1.5">
                 <Label>Patient <span className="text-destructive">*</span></Label>
-                <EntityPicker options={patientOptions} value={patient} onChange={setPatient}
-                  placeholder="Search by name, patient ID or phone…" />
+                {patientLocked && patient ? (
+                  <div className="flex items-center justify-between rounded-xl border bg-muted/40 px-3 py-2.5">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold">{patient.primary}</div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        <span className="font-mono">{patient.id}</span>
+                        {patient.secondary ? <> · {patient.secondary}</> : null}
+                        {patient.tertiary ? <> · {patient.tertiary}</> : null}
+                      </div>
+                    </div>
+                    <span className="ml-2 rounded-md bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Locked</span>
+                  </div>
+                ) : (
+                  <EntityPicker options={patientOptions} value={patient} onChange={setPatient}
+                    placeholder="Search by name, patient ID or phone…" />
+                )}
               </div>
               <div className="space-y-1.5">
-                <Label>Doctor <span className="text-destructive">*</span></Label>
+                <Label>
+                  Doctor {isLabMode ? <span className="text-xs text-muted-foreground font-normal">(optional — leave empty if not assigned)</span> : <span className="text-destructive">*</span>}
+                </Label>
                 <EntityPicker options={doctorOptions} value={doctor} onChange={setDoctor}
-                  placeholder="Search by name, doctor ID or phone…" />
+                  placeholder={isLabMode ? "Search doctor name (optional)…" : "Search by name, doctor ID or phone…"} />
+                {isLabMode && doctor && (
+                  <button type="button" onClick={() => setDoctor(null)}
+                    className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                    Clear doctor
+                  </button>
+                )}
               </div>
-              <div className="space-y-1.5"><Label>Diagnosis <span className="text-destructive">*</span></Label>
-                <Input className="h-11 rounded-xl" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
-              </div>
-              <div className="space-y-1.5"><Label>Treatment notes</Label>
-                <Textarea rows={3} className="rounded-xl" value={notes} onChange={e => setNotes(e.target.value)} />
-              </div>
-              <div className="space-y-1.5"><Label>Follow-up date</Label>
-                <Input type="date" className="h-11 rounded-xl" value={followup} onChange={e => setFollowup(e.target.value)} />
-              </div>
+              {!isLabMode && (
+                <>
+                  <div className="space-y-1.5"><Label>Diagnosis <span className="text-destructive">*</span></Label>
+                    <Input className="h-11 rounded-xl" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5"><Label>Treatment notes</Label>
+                    <Textarea rows={3} className="rounded-xl" value={notes} onChange={e => setNotes(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5"><Label>Follow-up date</Label>
+                    <Input type="date" className="h-11 rounded-xl" value={followup} onChange={e => setFollowup(e.target.value)} />
+                  </div>
+                </>
+              )}
             </section>
 
-            <section className="rounded-2xl border bg-card p-6 shadow-soft">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="font-display text-base font-semibold">Medicines</h2>
-                <Button type="button" size="sm" variant="outline" onClick={() => setMeds([...meds, { name: "", dosage: "", frequency: "", duration: "" }])}>
-                  <Plus className="mr-1 h-3.5 w-3.5" /> Add medicine
-                </Button>
-              </div>
-              <div className="space-y-3">
-                {meds.map((m, i) => (
-                  <div key={i} className="grid grid-cols-1 gap-2 rounded-xl border bg-muted/30 p-3 md:grid-cols-[2fr_1fr_1.2fr_1fr_auto]">
-                    <Input placeholder="Medicine" className="h-10 rounded-lg" value={m.name} onChange={e => update(i, "name", e.target.value)} />
-                    <Input placeholder="Dosage" className="h-10 rounded-lg" value={m.dosage} onChange={e => update(i, "dosage", e.target.value)} />
-                    <Input placeholder="Frequency" className="h-10 rounded-lg" value={m.frequency} onChange={e => update(i, "frequency", e.target.value)} />
-                    <Input placeholder="Duration" className="h-10 rounded-lg" value={m.duration} onChange={e => update(i, "duration", e.target.value)} />
-                    <Button type="button" variant="ghost" size="icon" onClick={() => setMeds(meds.filter((_, idx) => idx !== i))}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {!isLabMode && (
+              <section className="rounded-2xl border bg-card p-6 shadow-soft">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="font-display text-base font-semibold">Medicines</h2>
+                  <Button type="button" size="sm" variant="outline" onClick={() => setMeds([...meds, { name: "", dosage: "", frequency: "", duration: "" }])}>
+                    <Plus className="mr-1 h-3.5 w-3.5" /> Add medicine
+                  </Button>
+                </div>
+                <div className="space-y-3">
+                  {meds.map((m, i) => (
+                    <div key={i} className="grid grid-cols-1 gap-2 rounded-xl border bg-muted/30 p-3 md:grid-cols-[2fr_1fr_1.2fr_1fr_auto]">
+                      <Input placeholder="Medicine" className="h-10 rounded-lg" value={m.name} onChange={e => update(i, "name", e.target.value)} />
+                      <Input placeholder="Dosage" className="h-10 rounded-lg" value={m.dosage} onChange={e => update(i, "dosage", e.target.value)} />
+                      <Input placeholder="Frequency" className="h-10 rounded-lg" value={m.frequency} onChange={e => update(i, "frequency", e.target.value)} />
+                      <Input placeholder="Duration" className="h-10 rounded-lg" value={m.duration} onChange={e => update(i, "duration", e.target.value)} />
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setMeds(meds.filter((_, idx) => idx !== i))}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </fieldset>
 
           {/* Lab reports — accessible by everyone */}
