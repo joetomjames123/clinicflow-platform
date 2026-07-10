@@ -26,6 +26,9 @@ function PatientProfile() {
   const myBills = bills.filter(b => b.patient === patient.name);
   const myLabs = labReports.filter(l => l.patientId === patient.id);
 
+  const [viewingBill, setViewingBill] = useState<(typeof myBills)[number] | null>(null);
+  const [viewingLab, setViewingLab] = useState<LabReport | null>(null);
+
   const canEditRx = user?.role === "doctor";
   const canAddLab = user?.role === "doctor" || user?.role === "clinic_admin" || user?.role === "receptionist";
 
