@@ -61,7 +61,7 @@ function PrescriptionsPage() {
                         </Link>
                       </Button>
                     )}
-                    <Badge variant="outline" className="ml-1">Lab report</Badge>
+                    
                   </div>
                 </TableCell>
               </TableRow>
