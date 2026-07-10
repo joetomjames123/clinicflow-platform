@@ -3,7 +3,10 @@ import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { followUps as INITIAL, type FollowUp } from "@/lib/sample-data";
 import { CalendarClock, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -12,10 +15,24 @@ export const Route = createFileRoute("/app/followups")({ component: FollowUpsPag
 
 function FollowUpsPage() {
   const [rows, setRows] = useState<FollowUp[]>(INITIAL);
+  const [rescheduling, setRescheduling] = useState<FollowUp | null>(null);
+  const [newDate, setNewDate] = useState("");
 
   const mark = (id: string, status: FollowUp["status"]) => {
     setRows(rs => rs.map(r => r.id === id ? { ...r, status } : r));
     toast.success(`Follow-up ${status.toLowerCase()}`);
+  };
+
+  const openReschedule = (r: FollowUp) => {
+    setRescheduling(r);
+    setNewDate(r.date);
+  };
+
+  const confirmReschedule = () => {
+    if (!rescheduling || !newDate) { toast.error("Please pick a new date"); return; }
+    setRows(rs => rs.map(r => r.id === rescheduling.id ? { ...r, date: newDate, status: "Rescheduled" } : r));
+    toast.success(`Follow-up rescheduled to ${newDate}`);
+    setRescheduling(null);
   };
 
   const pending = rows.filter(r => r.status === "Pending").length;
@@ -64,7 +81,7 @@ function FollowUpsPage() {
                     <Button size="sm" variant="ghost" onClick={() => mark(r.id, "Done")}>
                       <Check className="mr-1 h-3.5 w-3.5" />Done
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => mark(r.id, "Rescheduled")}>
+                    <Button size="sm" variant="ghost" onClick={() => openReschedule(r)}>
                       <RotateCcw className="mr-1 h-3.5 w-3.5" />Reschedule
                     </Button>
                   </div>
@@ -74,6 +91,28 @@ function FollowUpsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={!!rescheduling} onOpenChange={(o) => !o && setRescheduling(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Reschedule follow-up</DialogTitle></DialogHeader>
+          {rescheduling && (
+            <div className="space-y-3">
+              <div className="text-sm">
+                <div className="font-semibold">{rescheduling.patient}</div>
+                <div className="text-xs text-muted-foreground">{rescheduling.reason}</div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>New date</Label>
+                <Input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} className="h-11 rounded-xl" />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRescheduling(null)}>Cancel</Button>
+            <Button onClick={confirmReschedule}>Confirm reschedule</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
