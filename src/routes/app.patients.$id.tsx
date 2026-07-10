@@ -155,16 +155,18 @@ function PatientProfile() {
               )}
               {myLabs.length === 0 && <EmptyCard label="No lab reports yet" />}
               {myLabs.map(l => (
-                <div key={l.id} className="rounded-2xl border bg-card p-5 shadow-soft">
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => setViewingLab(l)}
+                  className="w-full text-left rounded-2xl border bg-card p-5 shadow-soft hover:border-primary/60 hover:shadow-md transition"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="font-mono text-xs text-muted-foreground">{l.id} · {l.date}{l.prescriptionId ? ` · linked ${l.prescriptionId}` : ""}</div>
                       <div className="font-display text-base font-semibold">{l.test}</div>
                     </div>
-                    <Button size="sm" variant="ghost"
-                      onClick={() => sendWhatsApp(patient.phone, `Lab report ${l.id} — ${l.test}: ${l.result} (ref ${l.reference})`)}>
-                      <Send className="h-3.5 w-3.5" />
-                    </Button>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
                   </div>
                   {l.fileName ? (
                     <div className="mt-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm">📎 {l.fileName}</div>
@@ -172,11 +174,10 @@ function PatientProfile() {
                     <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                       <div><div className="text-xs text-muted-foreground">Result</div><div className="font-semibold">{l.result}</div></div>
                       <div><div className="text-xs text-muted-foreground">Reference</div><div>{l.reference}</div></div>
-                      {l.notes && <div className="col-span-2 text-xs text-muted-foreground">Note: {l.notes}</div>}
                     </div>
                   )}
                   <div className="mt-3 text-xs text-muted-foreground">Uploaded by {l.uploadedBy}</div>
-                </div>
+                </button>
               ))}
             </TabsContent>
 
