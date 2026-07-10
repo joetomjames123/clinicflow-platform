@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { prescriptions } from "@/lib/sample-data";
 import { useAuth } from "@/lib/auth";
@@ -61,7 +60,7 @@ function PrescriptionsPage() {
                         </Link>
                       </Button>
                     )}
-                    <Badge variant="outline" className="ml-1">Lab report</Badge>
+                    
                   </div>
                 </TableCell>
               </TableRow>

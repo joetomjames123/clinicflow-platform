@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { Textarea } from "@/components/ui/textarea";
+import { FileUploader } from "@/components/forms/file-uploader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/clinics/new")({ component: AddClinic });
@@ -55,10 +56,7 @@ function AddClinic() {
         <aside className="space-y-6">
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <h2 className="mb-3 font-display text-base font-semibold">Branding</h2>
-            <div className="aspect-square rounded-xl border-2 border-dashed border-border bg-muted/30 grid place-items-center text-xs text-muted-foreground">
-              Drop logo or click to upload
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">PNG or SVG · up to 2 MB</p>
+            <FileUploader label="Drop logo or click to upload" accept="image/png,image/svg+xml,image/jpeg" hint="PNG or SVG · up to 2 MB" />
           </section>
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <h2 className="mb-3 font-display text-base font-semibold">Trial</h2>

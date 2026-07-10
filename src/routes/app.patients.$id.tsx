@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { patients, prescriptions, bills, appointments, labReports } from "@/lib/sample-data";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { patients, prescriptions, bills, appointments, labReports, type LabReport } from "@/lib/sample-data";
 import { downloadCSV, printDocument } from "@/lib/exporters";
 import { sendWhatsApp } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import {
   Phone, MapPin, MessageCircle, Calendar, AlertTriangle, FileText, Receipt,
-  FolderOpen, FlaskConical, Download, Send, Printer, Edit,
+  FolderOpen, FlaskConical, Download, Send, Printer, Edit, Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/patients/$id")({ component: PatientProfile });
@@ -23,6 +25,9 @@ function PatientProfile() {
   const myRx = prescriptions.filter(r => r.patientId === patient.id);
   const myBills = bills.filter(b => b.patient === patient.name);
   const myLabs = labReports.filter(l => l.patientId === patient.id);
+
+  const [viewingBill, setViewingBill] = useState<(typeof myBills)[number] | null>(null);
+  const [viewingLab, setViewingLab] = useState<LabReport | null>(null);
 
   const canEditRx = user?.role === "doctor";
   const canAddLab = user?.role === "doctor" || user?.role === "clinic_admin" || user?.role === "receptionist";
@@ -150,16 +155,18 @@ function PatientProfile() {
               )}
               {myLabs.length === 0 && <EmptyCard label="No lab reports yet" />}
               {myLabs.map(l => (
-                <div key={l.id} className="rounded-2xl border bg-card p-5 shadow-soft">
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => setViewingLab(l)}
+                  className="w-full text-left rounded-2xl border bg-card p-5 shadow-soft hover:border-primary/60 hover:shadow-md transition"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="font-mono text-xs text-muted-foreground">{l.id} · {l.date}{l.prescriptionId ? ` · linked ${l.prescriptionId}` : ""}</div>
                       <div className="font-display text-base font-semibold">{l.test}</div>
                     </div>
-                    <Button size="sm" variant="ghost"
-                      onClick={() => sendWhatsApp(patient.phone, `Lab report ${l.id} — ${l.test}: ${l.result} (ref ${l.reference})`)}>
-                      <Send className="h-3.5 w-3.5" />
-                    </Button>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
                   </div>
                   {l.fileName ? (
                     <div className="mt-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm">📎 {l.fileName}</div>
@@ -167,11 +174,10 @@ function PatientProfile() {
                     <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                       <div><div className="text-xs text-muted-foreground">Result</div><div className="font-semibold">{l.result}</div></div>
                       <div><div className="text-xs text-muted-foreground">Reference</div><div>{l.reference}</div></div>
-                      {l.notes && <div className="col-span-2 text-xs text-muted-foreground">Note: {l.notes}</div>}
                     </div>
                   )}
                   <div className="mt-3 text-xs text-muted-foreground">Uploaded by {l.uploadedBy}</div>
-                </div>
+                </button>
               ))}
             </TabsContent>
 
@@ -180,15 +186,14 @@ function PatientProfile() {
                 <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Date</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {myBills.length ? myBills.map(b => (
-                    <TableRow key={b.id}>
+                    <TableRow key={b.id} className="cursor-pointer hover:bg-muted/40" onClick={() => setViewingBill(b)}>
                       <TableCell className="font-mono text-xs">{b.id}</TableCell>
                       <TableCell>{b.date}</TableCell>
                       <TableCell className="text-right tabular-nums">₹{b.amount.toFixed(2)}</TableCell>
                       <TableCell><Badge variant={b.status === "Paid" ? "secondary" : b.status === "Overdue" ? "destructive" : "outline"}>{b.status}</Badge></TableCell>
                       <TableCell className="text-right">
-                        <Button size="sm" variant="ghost"
-                          onClick={() => sendWhatsApp(patient.phone, `Invoice ${b.id} — ₹${b.amount.toFixed(2)} (${b.status})`)}>
-                          <Send className="h-3.5 w-3.5" />
+                        <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setViewingBill(b); }}>
+                          <Eye className="h-3.5 w-3.5" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -216,6 +221,91 @@ function PatientProfile() {
           </Tabs>
         </div>
       </div>
+
+      <Dialog open={!!viewingBill} onOpenChange={(o) => !o && setViewingBill(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Invoice {viewingBill?.id}</DialogTitle></DialogHeader>
+          {viewingBill && (() => {
+            const linkedRx = myRx[0];
+            return (
+              <div className="space-y-4 text-sm">
+                <div className="grid grid-cols-2 gap-3">
+                  <div><div className="text-xs text-muted-foreground">Patient</div><div className="font-semibold">{viewingBill.patient}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Date</div><div>{viewingBill.date}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Method</div><div>{viewingBill.method}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Status</div>
+                    <Badge variant={viewingBill.status === "Paid" ? "secondary" : viewingBill.status === "Overdue" ? "destructive" : "outline"}>{viewingBill.status}</Badge>
+                  </div>
+                </div>
+                {linkedRx && (
+                  <div>
+                    <div className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Medicines ({linkedRx.id} — {linkedRx.diagnosis})</div>
+                    <div className="rounded-xl border divide-y">
+                      {linkedRx.medicines.map((m, i) => (
+                        <div key={i} className="flex items-center justify-between px-3 py-2">
+                          <div>
+                            <div className="font-medium">{m.name}</div>
+                            <div className="text-xs text-muted-foreground">{m.dosage} · {m.frequency} · {m.duration}</div>
+                          </div>
+                          <div className="tabular-nums text-sm">₹{(m.unitPrice ?? 0).toFixed(2)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between rounded-xl bg-muted/40 px-3 py-2 font-semibold">
+                  <span>Total</span>
+                  <span className="tabular-nums">₹{viewingBill.amount.toFixed(2)}</span>
+                </div>
+              </div>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => viewingBill && sendWhatsApp(patient.phone, `Invoice ${viewingBill.id} — ₹${viewingBill.amount.toFixed(2)} (${viewingBill.status})`)}>
+              <Send className="mr-1.5 h-4 w-4" />Send on WhatsApp
+            </Button>
+            <Button onClick={() => setViewingBill(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewingLab} onOpenChange={(o) => !o && setViewingLab(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>{viewingLab?.test}</DialogTitle></DialogHeader>
+          {viewingLab && (
+            <div className="space-y-4 text-sm">
+              <div className="text-xs text-muted-foreground font-mono">{viewingLab.id} · {viewingLab.date}{viewingLab.prescriptionId ? ` · linked ${viewingLab.prescriptionId}` : ""}</div>
+              {viewingLab.fileName && (
+                <div className="rounded-xl border bg-muted/30 p-4 flex items-center gap-3">
+                  <FolderOpen className="h-6 w-6 text-primary" />
+                  <div className="flex-1">
+                    <div className="font-medium">{viewingLab.fileName}</div>
+                    <div className="text-xs text-muted-foreground">Attached file</div>
+                  </div>
+                  <Button size="sm" variant="outline"><Download className="mr-1.5 h-3.5 w-3.5" />Download</Button>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <div><div className="text-xs text-muted-foreground">Result</div><div className="font-semibold">{viewingLab.result}</div></div>
+                <div><div className="text-xs text-muted-foreground">Reference range</div><div>{viewingLab.reference}</div></div>
+              </div>
+              {viewingLab.notes && (
+                <div className="rounded-xl bg-muted/40 p-3">
+                  <div className="text-xs font-semibold uppercase text-muted-foreground mb-1">Notes</div>
+                  <div>{viewingLab.notes}</div>
+                </div>
+              )}
+              <div className="text-xs text-muted-foreground">Uploaded by {viewingLab.uploadedBy}</div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => viewingLab && sendWhatsApp(patient.phone, `Lab report ${viewingLab.id} — ${viewingLab.test}: ${viewingLab.result} (ref ${viewingLab.reference})`)}>
+              <Send className="mr-1.5 h-4 w-4" />Send on WhatsApp
+            </Button>
+            <Button onClick={() => setViewingLab(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

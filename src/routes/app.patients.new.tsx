@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { FileUploader } from "@/components/forms/file-uploader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/patients/new")({ component: NewPatient });
@@ -73,7 +74,7 @@ function NewPatient() {
         <aside className="space-y-6">
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <h2 className="mb-3 font-display text-base font-semibold">Patient photo</h2>
-            <div className="aspect-square rounded-xl border-2 border-dashed bg-muted/30 grid place-items-center text-xs text-muted-foreground">Upload photo</div>
+            <FileUploader label="Upload photo" accept="image/*" hint="JPG or PNG · up to 5 MB" />
           </section>
           <div className="flex gap-2">
             <Button type="button" variant="outline" className="flex-1" onClick={() => navigate({ to: "/app/patients" })}>Cancel</Button>
