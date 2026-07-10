@@ -186,15 +186,14 @@ function PatientProfile() {
                 <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Date</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {myBills.length ? myBills.map(b => (
-                    <TableRow key={b.id}>
+                    <TableRow key={b.id} className="cursor-pointer hover:bg-muted/40" onClick={() => setViewingBill(b)}>
                       <TableCell className="font-mono text-xs">{b.id}</TableCell>
                       <TableCell>{b.date}</TableCell>
                       <TableCell className="text-right tabular-nums">₹{b.amount.toFixed(2)}</TableCell>
                       <TableCell><Badge variant={b.status === "Paid" ? "secondary" : b.status === "Overdue" ? "destructive" : "outline"}>{b.status}</Badge></TableCell>
                       <TableCell className="text-right">
-                        <Button size="sm" variant="ghost"
-                          onClick={() => sendWhatsApp(patient.phone, `Invoice ${b.id} — ₹${b.amount.toFixed(2)} (${b.status})`)}>
-                          <Send className="h-3.5 w-3.5" />
+                        <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setViewingBill(b); }}>
+                          <Eye className="h-3.5 w-3.5" />
                         </Button>
                       </TableCell>
                     </TableRow>
