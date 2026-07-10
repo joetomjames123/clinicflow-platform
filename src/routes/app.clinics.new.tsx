@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { Textarea } from "@/components/ui/textarea";
+import { FileUploader } from "@/components/forms/file-uploader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/clinics/new")({ component: AddClinic });
