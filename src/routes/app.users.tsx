@@ -59,7 +59,7 @@ function UsersPage() {
                 <AddUserDialog title="Add Super Admin" form={form} setForm={setForm} onSubmit={submit} onGenerate={genPwd} />
               </Dialog>
             )}
-            {(isClinicAdmin || isSuper) && (
+            {isClinicAdmin && (
               <Dialog open={inviteRole === "Clinic Admin"} onOpenChange={(o) => setInviteRole(o ? "Clinic Admin" : null)}>
                 <DialogTrigger asChild>
                   <Button><UserPlus className="mr-1.5 h-4 w-4" />Add Clinic Admin</Button>
