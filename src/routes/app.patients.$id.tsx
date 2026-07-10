@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { patients, prescriptions, bills, appointments, labReports } from "@/lib/sample-data";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { patients, prescriptions, bills, appointments, labReports, type LabReport } from "@/lib/sample-data";
 import { downloadCSV, printDocument } from "@/lib/exporters";
 import { sendWhatsApp } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import {
   Phone, MapPin, MessageCircle, Calendar, AlertTriangle, FileText, Receipt,
-  FolderOpen, FlaskConical, Download, Send, Printer, Edit,
+  FolderOpen, FlaskConical, Download, Send, Printer, Edit, Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/patients/$id")({ component: PatientProfile });
