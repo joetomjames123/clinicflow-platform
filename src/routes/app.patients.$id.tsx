@@ -221,6 +221,91 @@ function PatientProfile() {
           </Tabs>
         </div>
       </div>
+
+      <Dialog open={!!viewingBill} onOpenChange={(o) => !o && setViewingBill(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Invoice {viewingBill?.id}</DialogTitle></DialogHeader>
+          {viewingBill && (() => {
+            const linkedRx = myRx[0];
+            return (
+              <div className="space-y-4 text-sm">
+                <div className="grid grid-cols-2 gap-3">
+                  <div><div className="text-xs text-muted-foreground">Patient</div><div className="font-semibold">{viewingBill.patient}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Date</div><div>{viewingBill.date}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Method</div><div>{viewingBill.method}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Status</div>
+                    <Badge variant={viewingBill.status === "Paid" ? "secondary" : viewingBill.status === "Overdue" ? "destructive" : "outline"}>{viewingBill.status}</Badge>
+                  </div>
+                </div>
+                {linkedRx && (
+                  <div>
+                    <div className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Medicines ({linkedRx.id} — {linkedRx.diagnosis})</div>
+                    <div className="rounded-xl border divide-y">
+                      {linkedRx.medicines.map((m, i) => (
+                        <div key={i} className="flex items-center justify-between px-3 py-2">
+                          <div>
+                            <div className="font-medium">{m.name}</div>
+                            <div className="text-xs text-muted-foreground">{m.dosage} · {m.frequency} · {m.duration}</div>
+                          </div>
+                          <div className="tabular-nums text-sm">₹{(m.unitPrice ?? 0).toFixed(2)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between rounded-xl bg-muted/40 px-3 py-2 font-semibold">
+                  <span>Total</span>
+                  <span className="tabular-nums">₹{viewingBill.amount.toFixed(2)}</span>
+                </div>
+              </div>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => viewingBill && sendWhatsApp(patient.phone, `Invoice ${viewingBill.id} — ₹${viewingBill.amount.toFixed(2)} (${viewingBill.status})`)}>
+              <Send className="mr-1.5 h-4 w-4" />Send on WhatsApp
+            </Button>
+            <Button onClick={() => setViewingBill(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewingLab} onOpenChange={(o) => !o && setViewingLab(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>{viewingLab?.test}</DialogTitle></DialogHeader>
+          {viewingLab && (
+            <div className="space-y-4 text-sm">
+              <div className="text-xs text-muted-foreground font-mono">{viewingLab.id} · {viewingLab.date}{viewingLab.prescriptionId ? ` · linked ${viewingLab.prescriptionId}` : ""}</div>
+              {viewingLab.fileName && (
+                <div className="rounded-xl border bg-muted/30 p-4 flex items-center gap-3">
+                  <FolderOpen className="h-6 w-6 text-primary" />
+                  <div className="flex-1">
+                    <div className="font-medium">{viewingLab.fileName}</div>
+                    <div className="text-xs text-muted-foreground">Attached file</div>
+                  </div>
+                  <Button size="sm" variant="outline"><Download className="mr-1.5 h-3.5 w-3.5" />Download</Button>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <div><div className="text-xs text-muted-foreground">Result</div><div className="font-semibold">{viewingLab.result}</div></div>
+                <div><div className="text-xs text-muted-foreground">Reference range</div><div>{viewingLab.reference}</div></div>
+              </div>
+              {viewingLab.notes && (
+                <div className="rounded-xl bg-muted/40 p-3">
+                  <div className="text-xs font-semibold uppercase text-muted-foreground mb-1">Notes</div>
+                  <div>{viewingLab.notes}</div>
+                </div>
+              )}
+              <div className="text-xs text-muted-foreground">Uploaded by {viewingLab.uploadedBy}</div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => viewingLab && sendWhatsApp(patient.phone, `Lab report ${viewingLab.id} — ${viewingLab.test}: ${viewingLab.result} (ref ${viewingLab.reference})`)}>
+              <Send className="mr-1.5 h-4 w-4" />Send on WhatsApp
+            </Button>
+            <Button onClick={() => setViewingLab(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
