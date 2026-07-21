@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { toast } from "sonner";
 import { useAuth, type Role, ROLE_LABELS } from "@/lib/auth";
 
-
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
@@ -31,20 +30,41 @@ function Login() {
   const navigate = useNavigate();
   const [role, setRole] = useState<Role>("clinic_admin");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(role);
+
+    if (!email.trim()) {
+      toast.error("Email address is required");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+
+    if (!password.trim()) {
+      toast.error("Password is required");
+      return;
+    }
+
+    login(role, email);
     navigate({ to: "/app" });
   };
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Left brand panel */}
       <div className="relative hidden overflow-hidden bg-gradient-to-br from-primary via-primary to-info p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: "radial-gradient(circle at 20% 20%, white 0, transparent 40%), radial-gradient(circle at 80% 80%, white 0, transparent 40%)",
-        }} />
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, white 0, transparent 40%), radial-gradient(circle at 80% 80%, white 0, transparent 40%)",
+          }}
+        />
+
         <div className="relative flex items-center gap-2.5">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur">
             <Activity className="h-5 w-5" strokeWidth={2.5} />
@@ -62,6 +82,7 @@ function Login() {
           <p className="mt-4 max-w-md text-base text-primary-foreground/85">
             From patient registration to prescriptions and billing — ClinicFlow gives every role the clarity they need to deliver better care.
           </p>
+
           <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
             {[
               ["340+", "clinics"],
@@ -81,7 +102,6 @@ function Login() {
         </div>
       </div>
 
-      {/* Right form */}
       <div className="flex items-center justify-center bg-background p-6 sm:p-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8 flex items-center gap-2">
@@ -100,19 +120,33 @@ function Login() {
             <div className="space-y-2">
               <Label htmlFor="email">Work email</Label>
               <Input
-                id="email" type="email" placeholder="you@clinic.com"
-                value={email} onChange={(e) => setEmail(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="you@clinic.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-11 rounded-xl"
+                autoComplete="email"
+                required
               />
             </div>
+
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <ForgotPasswordDialog />
               </div>
-              <Input id="password" type="password" placeholder="••••••••" className="h-11 rounded-xl" defaultValue="demo-password" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                className="h-11 rounded-xl"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
             </div>
-
 
             <div className="space-y-2">
               <Label>Sign in as (demo)</Label>
@@ -120,9 +154,12 @@ function Login() {
                 {(Object.keys(ROLE_LABELS) as Role[]).map((r) => {
                   const Icon = ROLE_ICONS[r];
                   const active = role === r;
+
                   return (
                     <button
-                      type="button" key={r} onClick={() => setRole(r)}
+                      type="button"
+                      key={r}
+                      onClick={() => setRole(r)}
                       className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm transition-all ${
                         active
                           ? "border-primary bg-primary-soft text-primary shadow-soft"
@@ -147,7 +184,8 @@ function Login() {
           </form>
 
           <div className="mt-8 rounded-xl border bg-muted/40 p-4 text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">Demo mode:</span> no real authentication — pick a role to explore the matching dashboard. <Link to="/" className="underline">Back home</Link>
+            <span className="font-semibold text-foreground">Demo mode:</span> no real authentication — enter your email, password and pick a role to explore the matching dashboard.{" "}
+            <Link to="/" className="underline">Back home</Link>
           </div>
         </div>
       </div>
@@ -163,30 +201,52 @@ function ForgotPasswordDialog() {
   const [pw2, setPw2] = useState("");
 
   const reset = () => {
-    setStep("request"); setEmail(""); setPw(""); setPw2("");
+    setStep("request");
+    setEmail("");
+    setPw("");
+    setPw2("");
   };
 
   const sendCode = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) { toast.error("Enter your email"); return; }
+
+    if (!email.trim()) {
+      toast.error("Enter your email");
+      return;
+    }
+
     toast.success("Verification link sent — continue to set a new password");
     setStep("reset");
   };
 
   const savePw = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw.length < 8) { toast.error("Password must be at least 8 characters"); return; }
-    if (pw !== pw2) { toast.error("Passwords do not match"); return; }
+
+    if (pw.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (pw !== pw2) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
     toast.success("Password updated — you can sign in now");
-    setOpen(false); reset();
+    setOpen(false);
+    reset();
   };
 
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-      <button type="button" onClick={() => setOpen(true)}
-        className="text-xs font-medium text-primary hover:underline">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-xs font-medium text-primary hover:underline"
+      >
         Forgot password?
       </button>
+
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{step === "request" ? "Reset your password" : "Set a new password"}</DialogTitle>
@@ -196,27 +256,49 @@ function ForgotPasswordDialog() {
               : "Choose a strong password with at least 8 characters."}
           </DialogDescription>
         </DialogHeader>
+
         {step === "request" ? (
           <form onSubmit={sendCode} className="space-y-3">
             <div className="space-y-1.5">
               <Label>Work email</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@clinic.com" className="h-11 rounded-xl" autoFocus />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@clinic.com"
+                className="h-11 rounded-xl"
+                autoFocus
+              />
             </div>
-            <DialogFooter><Button type="submit" className="w-full">Send reset link</Button></DialogFooter>
+            <DialogFooter>
+              <Button type="submit" className="w-full">Send reset link</Button>
+            </DialogFooter>
           </form>
         ) : (
           <form onSubmit={savePw} className="space-y-3">
             <div className="space-y-1.5">
               <Label>New password</Label>
-              <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)}
-                placeholder="At least 8 characters" className="h-11 rounded-xl" autoFocus />
+              <Input
+                type="password"
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+                placeholder="At least 8 characters"
+                className="h-11 rounded-xl"
+                autoFocus
+              />
             </div>
+
             <div className="space-y-1.5">
               <Label>Confirm new password</Label>
-              <Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)}
-                placeholder="Re-enter password" className="h-11 rounded-xl" />
+              <Input
+                type="password"
+                value={pw2}
+                onChange={(e) => setPw2(e.target.value)}
+                placeholder="Re-enter password"
+                className="h-11 rounded-xl"
+              />
             </div>
+
             <DialogFooter className="gap-2 sm:gap-2">
               <Button type="button" variant="outline" onClick={() => setStep("request")}>Back</Button>
               <Button type="submit">Update password</Button>
@@ -227,4 +309,3 @@ function ForgotPasswordDialog() {
     </Dialog>
   );
 }
-
