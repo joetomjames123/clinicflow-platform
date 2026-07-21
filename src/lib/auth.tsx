@@ -43,7 +43,7 @@ const DEFAULT_USERS: Record<Role, AuthUser> = {
 
 interface AuthCtx {
   user: AuthUser | null;
-  login: (role: Role) => void;
+  login: (role: Role, email: string) => void;
   logout: () => void;
   setRole: (role: Role) => void;
 }
@@ -55,27 +55,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
     const raw = localStorage.getItem("cf_user");
+
     if (raw) {
-      try { setUser(JSON.parse(raw)); } catch { /* ignore */ }
+      try {
+        setUser(JSON.parse(raw));
+      } catch {
+        // ignore invalid saved user
+      }
     }
   }, []);
 
   const persist = (u: AuthUser | null) => {
     setUser(u);
+
     if (typeof window !== "undefined") {
-      if (u) localStorage.setItem("cf_user", JSON.stringify(u));
-      else localStorage.removeItem("cf_user");
+      if (u) {
+        localStorage.setItem("cf_user", JSON.stringify(u));
+      } else {
+        localStorage.removeItem("cf_user");
+      }
     }
   };
 
+  const nameFromEmail = (email: string) => {
+    const localPart = email.trim().split("@")[0] ?? "";
+
+    return (
+      localPart
+        .split(/[._-]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ") || email.trim()
+    );
+  };
+
   return (
-    <Ctx.Provider value={{
-      user,
-      login: (role) => persist(DEFAULT_USERS[role]),
-      logout: () => persist(null),
-      setRole: (role) => persist(DEFAULT_USERS[role]),
-    }}>
+    <Ctx.Provider
+      value={{
+        user,
+        login: (role, email) =>
+          persist({
+            ...DEFAULT_USERS[role],
+            name: nameFromEmail(email),
+            email: email.trim(),
+          }),
+        logout: () => persist(null),
+        setRole: (role) =>
+          persist({
+            ...DEFAULT_USERS[role],
+            name: user?.name ?? DEFAULT_USERS[role].name,
+            email: user?.email ?? DEFAULT_USERS[role].email,
+          }),
+      }}
+    >
       {children}
     </Ctx.Provider>
   );
@@ -83,7 +117,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const c = useContext(Ctx);
-  if (!c) throw new Error("useAuth must be used inside AuthProvider");
+
+  if (!c) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
   return c;
 }
 
